@@ -2,6 +2,12 @@ const dbConnect = require('../services/db');
 const Bet = require('../services/betModel');
 const Match = require('../services/matchModel');
 
+const HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+};
+
 exports.getBets = async (event) => {
     try {
         await dbConnect();
@@ -12,12 +18,14 @@ exports.getBets = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ bets }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error fetching bets' }),
         };
     }
@@ -32,6 +40,7 @@ exports.createBet = async (event) => {
         if (!matchday || !userId || !bets) {
             return {
                 statusCode: 400,
+                headers: HEADERS,
                 body: JSON.stringify({ error: 'Missing required fields' }),
             };
         }
@@ -42,6 +51,7 @@ exports.createBet = async (event) => {
         if (firstMatch && new Date(firstMatch.date) <= now) {
             return {
                 statusCode: 400,
+                headers: HEADERS,
                 body: JSON.stringify({ error: 'Deadline has passed' }),
             };
         }
@@ -52,6 +62,7 @@ exports.createBet = async (event) => {
         if (now > deadline) {
             return {
                 statusCode: 400,
+                headers: HEADERS,
                 body: JSON.stringify({ error: 'Deadline has passed' }),
             };
         }
@@ -61,6 +72,7 @@ exports.createBet = async (event) => {
             if (!validPredictions.includes(bet.prediction)) {
                 return {
                     statusCode: 400,
+                    headers: HEADERS,
                     body: JSON.stringify({
                         error: `Invalid prediction '${bet.prediction}' for match ${bet.matchId}. Must be 1, X, or 2`,
                     }),
@@ -81,12 +93,14 @@ exports.createBet = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ message: 'Bet created successfully' }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error creating bet' }),
         };
     }

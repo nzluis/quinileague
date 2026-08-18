@@ -1,6 +1,12 @@
 const dbConnect = require('../services/db');
 const Result = require('../services/resultModel');
 
+const HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+};
+
 exports.getStandings = async (event) => {
     try {
         await dbConnect();
@@ -32,12 +38,14 @@ exports.getStandings = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ standings }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error fetching standings' }),
         };
     }
