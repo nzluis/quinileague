@@ -1,0 +1,16 @@
+{
+    "name": "quinileague-functions",
+    "version": "1.0.0",
+    "description": "AWS Lambda functions for QuinileaGUE",
+    "main": "handler.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "dependencies": {
+        "mongoose": "^8.5.0"
+    },
+    "devDependencies": {
+        "serverless": "^4.41.0",
+        "serverless-offline": "^14.0.0"
+    }
+}

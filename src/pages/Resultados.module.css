@@ -1,0 +1,43 @@
+.container {
+    padding: 1rem 0;
+}
+
+.container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary);
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-light);
+}
+
+.matchday {
+    margin-bottom: 2rem;
+}
+
+.matchday h2 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.matches {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.match {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.score {
+    font-weight: 700;
+    color: var(--primary);
+}

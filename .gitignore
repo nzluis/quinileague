@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+.env
+.env.local
+
+# Build
+dist/
+functions/dist/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Serverless
+.serverless/
