@@ -1,13 +1,15 @@
 const API_URL = import.meta.env.VITE_API_URL || 'https://your-api.execute-api.region.amazonaws.com/prod';
 
 async function request(endpoint, options = {}) {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-        ...options,
-    });
+    const fetchOptions = { ...options };
+    
+    if (fetchOptions.body && typeof fetchOptions.body === 'object') {
+        fetchOptions.body = JSON.stringify(fetchOptions.body);
+    }
+    
+    delete fetchOptions.headers;
+    
+    const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
