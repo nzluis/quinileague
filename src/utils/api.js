@@ -1,13 +1,17 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://your-api.execute-api.region.amazonaws.com/prod';
+const API_URL = import.meta.env.VITE_API_URL || 'https://quinileague-api.dazzling-snagglefoot.workers.dev';
 
 async function request(endpoint, options = {}) {
-    const fetchOptions = { ...options };
+    const fetchOptions = {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+    };
     
     if (fetchOptions.body && typeof fetchOptions.body === 'object') {
         fetchOptions.body = JSON.stringify(fetchOptions.body);
     }
-    
-    delete fetchOptions.headers;
     
     const response = await fetch(`${API_URL}${endpoint}`, fetchOptions);
 
