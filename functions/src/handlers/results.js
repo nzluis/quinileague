@@ -1,0 +1,123 @@
+const dbConnect = require('../services/db');
+const Match = require('../services/matchModel');
+const Bet = require('../services/betModel');
+const Result = require('../services/resultModel');
+
+function calculatePoints(prediction, actualHomeScore, actualAwayScore) {
+    if (actualHomeScore === null || actualAwayScore === null) return 0;
+
+    let actualResult;
+    if (actualHomeScore > actualAwayScore) actualResult = '1';
+    else if (actualHomeScore < actualAwayScore) actualResult = '2';
+    else actualResult = 'X';
+
+    if (prediction === actualResult) {
+        return 3;
+    }
+
+    return 0;
+}
+
+exports.getResults = async (event) => {
+    try {
+        await dbConnect();
+
+        const matches = await Match.find({ status: 'finished' })
+            .sort({ matchday: -1, date: -1 })
+            .lean();
+
+        const resultsByMatchday = matches.reduce((acc, match) => {
+            if (!acc[match.matchday]) {
+                acc[match.matchday] = [];
+            }
+            acc[match.matchday].push(match);
+            return acc;
+        }, {});
+
+        const results = Object.entries(resultsByMatchday).map(([matchday, matches]) => ({
+            matchday: parseInt(matchday),
+            matches,
+        }));
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ results }),
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error fetching results' }),
+        };
+    }
+};
+
+exports.createResults = async (event) => {
+    try {
+        await dbConnect();
+
+        const { matchday, results } = JSON.parse(event.body);
+
+        if (!matchday || !results) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Missing required fields' }),
+            };
+        }
+
+        for (const result of results) {
+            await Match.findOneAndUpdate(
+                { matchId: result.matchId },
+                {
+                    homeScore: result.homeScore,
+                    awayScore: result.awayScore,
+                    status: 'finished',
+                }
+            );
+        }
+
+        const bets = await Bet.find({ matchday }).lean();
+        const matches = await Match.find({ matchday }).lean();
+
+        const pointsMap = {};
+
+        for (const bet of bets) {
+            const match = matches.find((m) => m.matchId === bet.matchId);
+            if (!match) continue;
+
+            if (!pointsMap[bet.userId]) {
+                pointsMap[bet.userId] = { points: 0, correct: 0 };
+            }
+
+            const points = calculatePoints(
+                bet.prediction,
+                match.homeScore,
+                match.awayScore
+            );
+
+            pointsMap[bet.userId].points += points;
+            if (points === 3) {
+                pointsMap[bet.userId].correct += 1;
+            }
+        }
+
+        const resultEntry = await Result.findOne({ matchday });
+        if (resultEntry) {
+            resultEntry.points = pointsMap;
+            await resultEntry.save();
+        } else {
+            await Result.create({ matchday, points: pointsMap });
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Results created successfully' }),
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error creating results' }),
+        };
+    }
+};

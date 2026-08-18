@@ -1,0 +1,68 @@
+service: quinileague-api
+
+frameworkVersion: '4'
+
+provider:
+    name: aws
+    runtime: nodejs20.x
+    region: eu-west-3
+    environment:
+        MONGODB_URI: ${env:MONGODB_URI}
+        FOOTBALL_DATA_TOKEN: ${env:FOOTBALL_DATA_TOKEN}
+    memorySize: 256
+    timeout: 10
+    httpApi:
+        cors: true
+
+functions:
+    getMatches:
+        handler: src/handlers/matches.getMatches
+        events:
+            - httpApi:
+                  path: /matches
+                  method: get
+
+    getNextMatchday:
+        handler: src/handlers/matches.getNextMatchday
+        events:
+            - httpApi:
+                  path: /matches/next
+                  method: get
+
+    getBets:
+        handler: src/handlers/bets.getBets
+        events:
+            - httpApi:
+                  path: /bets
+                  method: get
+
+    createBet:
+        handler: src/handlers/bets.createBet
+        events:
+            - httpApi:
+                  path: /bets
+                  method: post
+
+    createResults:
+        handler: src/handlers/results.createResults
+        events:
+            - httpApi:
+                  path: /results
+                  method: post
+
+    getResults:
+        handler: src/handlers/results.getResults
+        events:
+            - httpApi:
+                  path: /results
+                  method: get
+
+    getStandings:
+        handler: src/handlers/standings.getStandings
+        events:
+            - httpApi:
+                  path: /standings
+                  method: get
+
+plugins:
+    - serverless-offline

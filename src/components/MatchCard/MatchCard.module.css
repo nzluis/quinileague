@@ -1,0 +1,85 @@
+.card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.past {
+    opacity: 0.7;
+}
+
+.date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+}
+
+.match {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.team {
+    font-weight: 600;
+    font-size: 1.1rem;
+    flex: 1;
+    text-align: center;
+}
+
+.team:first-child {
+    text-align: right;
+}
+
+.team:last-child {
+    text-align: left;
+}
+
+.versus {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+.predictions {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.predBtn {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
+
+.predBtn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: #f0f9f0;
+}
+
+.predBtn.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.predBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.result {
+    text-align: center;
+    margin-top: 0.75rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--primary);
+}

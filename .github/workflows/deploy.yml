@@ -1,0 +1,54 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'functions/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'functions/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./functions
+
+      - name: Create deployment package
+        run: zip -r /tmp/quinileague-functions.zip src/ node_modules/ package.json
+        working-directory: ./functions
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: Update Lambda functions
+        run: |
+          for func in getMatches getNextMatchday getBets createBet getResults createResults getStandings; do
+            echo "Updating quinileague-$func..."
+            aws lambda update-function-code \
+              --function-name quinileague-$func \
+              --zip-file fileb:///tmp/quinileague-functions.zip \
+              --output json | jq -r '.FunctionName + ": " + .LastModified'
+          done
+
+      - name: Verify deployment
+        run: |
+          echo "Deployed Lambda functions:"
+          aws lambda list-functions --query 'Functions[?starts_with(FunctionName, `quinileague`)].FunctionName' --output text
