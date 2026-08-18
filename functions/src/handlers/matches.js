@@ -1,6 +1,12 @@
 const dbConnect = require('../services/db');
 const Match = require('../services/matchModel');
 
+const HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+};
+
 exports.getMatches = async (event) => {
     try {
         await dbConnect();
@@ -13,12 +19,14 @@ exports.getMatches = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ matches }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error fetching matches' }),
         };
     }
@@ -39,6 +47,7 @@ exports.getNextMatchday = async (event) => {
         if (!nextMatch) {
             return {
                 statusCode: 200,
+                headers: HEADERS,
                 body: JSON.stringify({ matchday: null, deadline: null }),
             };
         }
@@ -48,6 +57,7 @@ exports.getNextMatchday = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({
                 matchday: nextMatch.matchday,
                 deadline: deadline.toISOString(),
@@ -58,6 +68,7 @@ exports.getNextMatchday = async (event) => {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error fetching next matchday' }),
         };
     }

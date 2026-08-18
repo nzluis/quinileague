@@ -3,6 +3,12 @@ const Match = require('../services/matchModel');
 const Bet = require('../services/betModel');
 const Result = require('../services/resultModel');
 
+const HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+};
+
 function calculatePoints(prediction, actualHomeScore, actualAwayScore) {
     if (actualHomeScore === null || actualAwayScore === null) return 0;
 
@@ -41,12 +47,14 @@ exports.getResults = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ results }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error fetching results' }),
         };
     }
@@ -61,6 +69,7 @@ exports.createResults = async (event) => {
         if (!matchday || !results) {
             return {
                 statusCode: 400,
+                headers: HEADERS,
                 body: JSON.stringify({ error: 'Missing required fields' }),
             };
         }
@@ -111,12 +120,14 @@ exports.createResults = async (event) => {
 
         return {
             statusCode: 200,
+            headers: HEADERS,
             body: JSON.stringify({ message: 'Results created successfully' }),
         };
     } catch (error) {
         console.error(error);
         return {
             statusCode: 500,
+            headers: HEADERS,
             body: JSON.stringify({ error: 'Error creating results' }),
         };
     }
