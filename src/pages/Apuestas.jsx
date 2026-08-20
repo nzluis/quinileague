@@ -108,26 +108,26 @@ export default function Apuestas() {
                         )}
                     </div>
 
-                    <div className={styles.matches}>
-                        {matches.map((match) => (
-                            <MatchCard
-                                key={match.matchId}
-                                match={match}
-                                prediction={bets[match.matchId]}
-                                onPredictionChange={(pred) => handlePrediction(match.matchId, pred)}
-                                disabled={isLocked}
-                                readOnly={isLocked}
-                            />
-                        ))}
-                    </div>
-
-                    {isLocked ? (
-                        !hasUserBet && (
-                            <div className={styles.noBetMsg}>
-                                Apuesta no realizada
-                            </div>
-                        )
+                    {(!isLocked || hasUserBet) ? (
+                        <div className={styles.matches}>
+                            {matches.map((match) => (
+                                <MatchCard
+                                    key={match.matchId}
+                                    match={match}
+                                    prediction={bets[match.matchId]}
+                                    onPredictionChange={(pred) => handlePrediction(match.matchId, pred)}
+                                    disabled={isLocked}
+                                    readOnly={isLocked}
+                                />
+                            ))}
+                        </div>
                     ) : (
+                        <div className={styles.noBetMsg}>
+                            Apuesta no realizada
+                        </div>
+                    )}
+
+                    {!isLocked && (
                         <button
                             onClick={handleSubmit}
                             disabled={submitting || Object.keys(bets).length === 0}
