@@ -25,7 +25,7 @@ export default function Apuestas() {
             const [matchesRes, betsRes, nextRes] = await Promise.all([
                 api.getMatches(matchday),
                 api.getBets(matchday),
-                api.getNextMatchday(),
+                api.getNextMatchday(matchday),
             ]);
 
             setMatches(matchesRes.matches || []);

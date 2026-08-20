@@ -36,7 +36,36 @@ exports.getNextMatchday = async (event) => {
     try {
         await dbConnect();
 
+        const requestedMatchday = parseInt(event.queryStringParameters?.matchday) || null;
         const now = new Date();
+
+        if (requestedMatchday) {
+            const firstMatch = await Match.findOne({ matchday: requestedMatchday })
+                .sort({ date: 1 })
+                .lean();
+
+            if (!firstMatch) {
+                return {
+                    statusCode: 200,
+                    headers: HEADERS,
+                    body: JSON.stringify({ matchday: null, deadline: null }),
+                };
+            }
+
+            const deadline = new Date(firstMatch.date);
+            deadline.setHours(deadline.getHours() - 1);
+
+            return {
+                statusCode: 200,
+                headers: HEADERS,
+                body: JSON.stringify({
+                    matchday: requestedMatchday,
+                    deadline: deadline.toISOString(),
+                    firstMatchDate: firstMatch.date,
+                }),
+            };
+        }
+
         const nextMatch = await Match.findOne({
             date: { $gt: now },
             status: 'scheduled',
