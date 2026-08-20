@@ -1,7 +1,7 @@
 .card {
     background: var(--surface);
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -10,22 +10,22 @@
 }
 
 .date {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-light);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .match {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .team {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     flex: 1;
     text-align: center;
 }
@@ -40,23 +40,23 @@
 
 .versus {
     color: var(--text-light);
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .predictions {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .predBtn {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
     background: white;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: all 0.2s;
 }
 
@@ -80,14 +80,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 48px;
+    height: 44px;
 }
 
 .predictionValue {
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--primary);
-    padding: 0.25rem 1rem;
+    padding: 0.2rem 0.75rem;
     border: 2px solid var(--primary);
     border-radius: 8px;
     background: rgba(42, 125, 44, 0.08);
@@ -95,14 +95,66 @@
 
 .predictionEmpty {
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--text-light);
 }
 
 .result {
     text-align: center;
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     color: var(--primary);
+}
+
+@media (min-width: 768px) {
+    .card {
+        padding: 1.25rem;
+    }
+
+    .date {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .match {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .team {
+        font-size: 1.1rem;
+    }
+
+    .versus {
+        font-size: 0.85rem;
+    }
+
+    .predictions {
+        gap: 0.5rem;
+    }
+
+    .predBtn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+
+    .readOnlyPrediction {
+        height: 48px;
+    }
+
+    .predictionValue {
+        font-size: 1.5rem;
+        padding: 0.25rem 1rem;
+    }
+
+    .predictionEmpty {
+        font-size: 1.5rem;
+    }
+
+    .result {
+        font-size: 1.25rem;
+        margin-top: 0.75rem;
+    }
 }
