@@ -28,8 +28,8 @@ export default {
         return request(`/matches?matchday=${matchday}`);
     },
 
-    async getNextMatchday() {
-        return request('/matches/next');
+    async getNextMatchday(matchday) {
+        return request(`/matches/next${matchday ? `?matchday=${matchday}` : ''}`);
     },
 
     async getBets(matchday) {
