@@ -76,6 +76,29 @@
     opacity: 0.6;
 }
 
+.readOnlyPrediction {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+}
+
+.predictionValue {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--primary);
+    padding: 0.25rem 1rem;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    background: rgba(42, 125, 44, 0.08);
+}
+
+.predictionEmpty {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-light);
+}
+
 .result {
     text-align: center;
     margin-top: 0.75rem;
