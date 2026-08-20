@@ -10,7 +10,7 @@ const TOTAL_MATCHDAYS = 38;
 
 export default function Apuestas() {
     const { user } = useAuthenticator();
-    const [selectedMatchday, setSelectedMatchday] = useState(1);
+    const [selectedMatchday, setSelectedMatchday] = useState(undefined);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [matches, setMatches] = useState([]);
@@ -22,8 +22,22 @@ export default function Apuestas() {
     const hasUserBet = Object.keys(bets).length > 0;
 
     useEffect(() => {
+        if (selectedMatchday === undefined) return;
         fetchMatchday(selectedMatchday);
     }, [selectedMatchday]);
+
+    useEffect(() => {
+        if (selectedMatchday !== undefined) return;
+        api.getNextMatchday().then((res) => {
+            if (res.matchday) {
+                setSelectedMatchday(res.matchday);
+            } else {
+                setSelectedMatchday(1);
+            }
+        }).catch(() => {
+            setSelectedMatchday(1);
+        });
+    }, []);
 
     const fetchMatchday = async (matchday) => {
         setLoading(true);
