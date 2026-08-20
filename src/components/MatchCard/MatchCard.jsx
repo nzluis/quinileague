@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styles from './MatchCard.module.css';
 
 const PREDICTIONS = [
@@ -7,7 +6,13 @@ const PREDICTIONS = [
     { value: '2', label: '2' },
 ];
 
-export default function MatchCard({ match, prediction, onPredictionChange, disabled }) {
+const PREDICTION_LABELS = {
+    '1': 'Victoria local',
+    'X': 'Empate',
+    '2': 'Victoria visitante',
+};
+
+export default function MatchCard({ match, prediction, onPredictionChange, disabled, readOnly }) {
     const isPast = new Date(match.date) < new Date();
     const isLocked = disabled || isPast;
 
@@ -27,19 +32,32 @@ export default function MatchCard({ match, prediction, onPredictionChange, disab
                 <span className={styles.versus}>vs</span>
                 <span className={styles.team}>{match.awayTeam}</span>
             </div>
-            <div className={styles.predictions}>
-                {PREDICTIONS.map((pred) => (
-                    <button
-                        key={pred.value}
-                        type="button"
-                        className={`${styles.predBtn} ${prediction === pred.value ? styles.selected : ''}`}
-                        onClick={() => onPredictionChange(pred.value)}
-                        disabled={isLocked}
-                    >
-                        {pred.label}
-                    </button>
-                ))}
-            </div>
+
+            {readOnly ? (
+                <div className={styles.readOnlyPrediction}>
+                    {prediction ? (
+                        <span className={styles.predictionValue}>{prediction}</span>
+                    ) : (
+                        <span className={styles.predictionEmpty}>—</span>
+                    )}
+                </div>
+            ) : (
+                <div className={styles.predictions}>
+                    {PREDICTIONS.map((pred) => (
+                        <button
+                            key={pred.value}
+                            type="button"
+                            className={`${styles.predBtn} ${prediction === pred.value ? styles.selected : ''}`}
+                            onClick={() => onPredictionChange(pred.value)}
+                            disabled={isLocked}
+                            title={PREDICTION_LABELS[pred.value]}
+                        >
+                            {pred.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {match.homeScore !== null && (
                 <div className={styles.result}>
                     {match.homeScore} - {match.awayScore}

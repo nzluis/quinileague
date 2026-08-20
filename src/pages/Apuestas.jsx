@@ -6,20 +6,26 @@ import toast from 'react-hot-toast';
 import api from '../utils/api';
 import styles from './Apuestas.module.css';
 
+const TOTAL_MATCHDAYS = 38;
+
 export default function Apuestas() {
     const { user } = useAuthenticator();
-    const [matchday, setMatchday] = useState(1);
-    const [matches, setMatches] = useState([]);
-    const [bets, setBets] = useState({});
+    const [selectedMatchday, setSelectedMatchday] = useState(1);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [matches, setMatches] = useState([]);
+    const [bets, setBets] = useState({});
     const [deadline, setDeadline] = useState(null);
+    const [firstMatchDate, setFirstMatchDate] = useState(null);
+
+    const isLocked = deadline && new Date() > new Date(deadline);
+    const hasUserBet = Object.keys(bets).length > 0;
 
     useEffect(() => {
-        fetchData();
-    }, [matchday]);
+        fetchMatchday(selectedMatchday);
+    }, [selectedMatchday]);
 
-    const fetchData = async () => {
+    const fetchMatchday = async (matchday) => {
         setLoading(true);
         try {
             const [matchesRes, betsRes, nextRes] = await Promise.all([
@@ -30,6 +36,7 @@ export default function Apuestas() {
 
             setMatches(matchesRes.matches || []);
             setDeadline(nextRes.deadline || null);
+            setFirstMatchDate(nextRes.firstMatchDate || null);
 
             const userBets = {};
             (betsRes.bets || []).forEach((bet) => {
@@ -51,7 +58,7 @@ export default function Apuestas() {
     };
 
     const handleSubmit = async () => {
-        if (deadline && new Date() > new Date(deadline)) {
+        if (isLocked) {
             toast.error('El plazo ha expirado');
             return;
         }
@@ -59,7 +66,7 @@ export default function Apuestas() {
         setSubmitting(true);
         try {
             await api.submitBet({
-                matchday,
+                matchday: selectedMatchday,
                 userId: user.username,
                 bets: Object.entries(bets).map(([matchId, prediction]) => ({
                     matchId,
@@ -74,47 +81,62 @@ export default function Apuestas() {
         }
     };
 
-    const isLocked = deadline && new Date() > new Date(deadline);
-
-    if (loading) return <Spinner />;
-
     return (
         <div className={styles.container}>
-            <div className={styles.header}>
-                <h1>Jornada {matchday}</h1>
-                {deadline && (
-                    <p className={styles.deadline}>
-                        Plazo: {new Date(deadline).toLocaleString('es-ES')}
-                    </p>
-                )}
-            </div>
-
-            <div className={styles.matchdaySelector}>
-                <button onClick={() => setMatchday((m) => Math.max(1, m - 1))}>←</button>
-                <span>Jornada {matchday}</span>
-                <button onClick={() => setMatchday((m) => Math.min(38, m + 1))}>→</button>
-            </div>
-
-            <div className={styles.matches}>
-                {matches.map((match) => (
-                    <MatchCard
-                        key={match.matchId}
-                        match={match}
-                        prediction={bets[match.matchId]}
-                        onPredictionChange={(pred) => handlePrediction(match.matchId, pred)}
-                        disabled={isLocked}
-                    />
+            <div className={styles.indexBar}>
+                {Array.from({ length: TOTAL_MATCHDAYS }, (_, i) => i + 1).map((n) => (
+                    <button
+                        key={n}
+                        className={`${styles.indexBtn} ${n === selectedMatchday ? styles.indexBtnActive : ''}`}
+                        onClick={() => setSelectedMatchday(n)}
+                    >
+                        {n}
+                    </button>
                 ))}
             </div>
 
-            {!isLocked && Object.keys(bets).length > 0 && (
-                <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    className={styles.submitBtn}
-                >
-                    {submitting ? 'Guardando...' : 'Guardar Apuestas'}
-                </button>
+            {loading ? (
+                <Spinner height="50vh" />
+            ) : (
+                <>
+                    <div className={styles.contentHeader}>
+                        <h1>Jornada {selectedMatchday}</h1>
+                        {deadline && (
+                            <p className={styles.deadline}>
+                                {isLocked ? 'Plazo cerrado' : `Plazo: ${new Date(deadline).toLocaleString('es-ES')}`}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className={styles.matches}>
+                        {matches.map((match) => (
+                            <MatchCard
+                                key={match.matchId}
+                                match={match}
+                                prediction={bets[match.matchId]}
+                                onPredictionChange={(pred) => handlePrediction(match.matchId, pred)}
+                                disabled={isLocked}
+                                readOnly={isLocked}
+                            />
+                        ))}
+                    </div>
+
+                    {isLocked ? (
+                        !hasUserBet && (
+                            <div className={styles.noBetMsg}>
+                                Apuesta no realizada
+                            </div>
+                        )
+                    ) : (
+                        <button
+                            onClick={handleSubmit}
+                            disabled={submitting || Object.keys(bets).length === 0}
+                            className={styles.submitBtn}
+                        >
+                            {submitting ? 'Guardando...' : 'Guardar Apuestas'}
+                        </button>
+                    )}
+                </>
             )}
         </div>
     );

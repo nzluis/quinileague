@@ -1,10 +1,10 @@
-export default function Spinner() {
+export default function Spinner({ height = '60vh' }) {
     return (
         <div style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            minHeight: '60vh'
+            minHeight: height
         }}>
             <div style={{
                 width: '40px',
