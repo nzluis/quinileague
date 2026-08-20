@@ -7,6 +7,7 @@ import Clasificacion from './pages/Clasificacion';
 import Resultados from './pages/Resultados';
 import Admin from './pages/Admin';
 import Spinner from './components/Spinner/Spinner';
+import layoutStyles from './Layout.module.css';
 
 function ProtectedRoute({ children }) {
     const { authStatus } = useAuthenticator();
@@ -19,7 +20,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <Navbar />
-            <main style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <main className={layoutStyles.main}>
                 <Routes>
                     <Route path="/" element={<Menu />} />
                     <Route

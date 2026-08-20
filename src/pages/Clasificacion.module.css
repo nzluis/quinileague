@@ -1,17 +1,18 @@
 .container {
     padding: 1rem 0;
+    overflow-x: auto;
 }
 
 .container h1 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     color: var(--primary);
+    font-size: 1.5rem;
 }
 
 .table {
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
+    min-width: 320px;
     border-collapse: collapse;
     background: var(--surface);
     border-radius: 12px;
@@ -21,7 +22,7 @@
 
 .table th,
 .table td {
-    padding: 1rem;
+    padding: 0.875rem 1rem;
     text-align: left;
 }
 
@@ -29,6 +30,11 @@
     background: var(--primary);
     color: white;
     font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table td {
+    font-size: 0.95rem;
 }
 
 .table tr:not(:last-child) td {
@@ -38,4 +44,24 @@
 .table td:first-child {
     font-weight: 700;
     color: var(--primary);
+}
+
+@media (min-width: 768px) {
+    .container h1 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 1rem;
+    }
+
+    .table th {
+        font-size: 1rem;
+    }
+
+    .table td {
+        font-size: 1rem;
+    }
 }

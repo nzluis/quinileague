@@ -2,9 +2,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1rem;
     background: var(--primary);
     color: white;
+    position: relative;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .brand a {
@@ -12,38 +21,148 @@
     align-items: center;
     gap: 0.5rem;
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    color: white;
 }
 
 .logo {
+    font-size: 1.4rem;
+}
+
+.hamburger {
+    display: flex;
+    background: none;
+    border: none;
+    color: white;
     font-size: 1.5rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
 }
 
 .navLinks {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
+    display: none;
 }
 
-.navLinks a {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+.navLinksOpen {
+    display: flex;
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--primary);
+    z-index: 99;
+}
+
+.navLinksOpen ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.navLinksOpen li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navLinksOpen a,
+.navLinksOpen .signOut {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-size: 1.1rem;
     transition: background 0.2s;
 }
 
-.navLinks a:hover,
-.navLinks a.active {
+.navLinksOpen a:hover,
+.navLinksOpen .signOut:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.navLinksOpen .active {
     background: rgba(255, 255, 255, 0.15);
 }
 
 .signOut {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: none;
+    border: none;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
+    font-size: 1.1rem;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
 }
 
-.signOut:hover {
-    background: rgba(255, 255, 255, 0.2);
+.overlay {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .navbar {
+        padding: 1rem 2rem;
+    }
+
+    .hamburger {
+        display: none;
+    }
+
+    .navLinks {
+        display: flex;
+    }
+
+    .navLinks ul {
+        display: flex;
+        list-style: none;
+        gap: 0.5rem;
+    }
+
+    .navLinksOpen {
+        display: flex;
+        position: static;
+        background: none;
+    }
+
+    .navLinksOpen ul {
+        flex-direction: row;
+        align-items: center;
+        padding: 0;
+        gap: 0.5rem;
+    }
+
+    .navLinksOpen li {
+        border-bottom: none;
+    }
+
+    .navLinksOpen a,
+    .navLinksOpen .signOut {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        width: auto;
+        text-align: left;
+    }
+
+    .navLinksOpen a:hover,
+    .navLinksOpen .signOut:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .signOut {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        width: auto;
+        text-align: center;
+    }
+
+    .signOut:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .overlay {
+        display: none;
+    }
 }

@@ -4,18 +4,28 @@
 
 .indexBar {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.35rem;
-    margin-bottom: 2rem;
-    padding: 0.75rem;
+    gap: 0.3rem;
+    overflow-x: auto;
+    padding: 0.75rem 0.5rem;
     background: var(--surface);
     border-radius: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.indexBar::-webkit-scrollbar {
+    height: 4px;
+}
+
+.indexBar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
 }
 
 .indexBtn {
-    width: 36px;
-    height: 36px;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
     border: 2px solid transparent;
     border-radius: 8px;
     background: var(--background);
@@ -49,45 +59,44 @@
 }
 
 .contentHeader h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: var(--primary);
 }
 
 .deadline {
     color: var(--text-light);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     margin-top: 0.5rem;
 }
 
 .matches {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
 }
 
 .noBetMsg {
     text-align: center;
-    padding: 1.5rem;
+    padding: 1.25rem;
     margin-top: 1rem;
     background: var(--surface);
     border-radius: 12px;
     color: var(--text-light);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-style: italic;
 }
 
 .submitBtn {
     display: block;
     width: 100%;
-    max-width: 400px;
-    margin: 2rem auto 0;
+    margin: 1.5rem 0 0;
     padding: 1rem;
     border: none;
     border-radius: 8px;
     background: var(--secondary);
     color: white;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: opacity 0.2s;
 }
@@ -99,4 +108,35 @@
 .submitBtn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+}
+
+@media (min-width: 640px) {
+    .matches {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 1.5rem 0;
+    }
+
+    .contentHeader h1 {
+        font-size: 2rem;
+    }
+
+    .deadline {
+        font-size: 0.9rem;
+    }
+
+    .matches {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .submitBtn {
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }

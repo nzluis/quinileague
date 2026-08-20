@@ -14,6 +14,10 @@
     --text-light: #666666;
     --error: #e53935;
     --success: #43a047;
+
+    --bp-sm: 640px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
 }
 
 body {
