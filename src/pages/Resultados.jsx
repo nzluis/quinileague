@@ -10,12 +10,6 @@ function getDisplayName(userId) {
     return USER_NAMES[userId] || userId;
 }
 
-function actualResult(homeScore, awayScore) {
-    if (homeScore > awayScore) return '1';
-    if (homeScore < awayScore) return '2';
-    return 'X';
-}
-
 export default function Resultados() {
     const [availableMatchdays, setAvailableMatchdays] = useState([]);
     const [selectedMatchday, setSelectedMatchday] = useState(undefined);
@@ -40,15 +34,15 @@ export default function Resultados() {
 
     if (loading && !matchdayData) return <Spinner height="50vh" />;
 
-    const matchdaysWithResults = availableMatchdays;
+    const hasMatchdays = availableMatchdays.length > 0;
 
     return (
         <div className={styles.container}>
             <div className={styles.indexBar}>
-                {matchdaysWithResults.length === 0 ? (
+                {!hasMatchdays ? (
                     <span className={styles.noData}>No hay resultados aún</span>
                 ) : (
-                    matchdaysWithResults.map((n) => (
+                    availableMatchdays.map((n) => (
                         <button
                             key={n}
                             className={`${styles.indexBtn} ${n === selectedMatchday ? styles.indexBtnActive : ''}`}
@@ -60,11 +54,11 @@ export default function Resultados() {
                 )}
             </div>
 
-            {matchdaysWithResults.length === 0 ? (
+            {!hasMatchdays ? (
                 <Spinner height="40vh" />
             ) : loading ? (
                 <Spinner height="40vh" />
-            ) : matchdayData && matchdayData.matches.length > 0 ? (
+            ) : matchdayData?.matches?.length > 0 ? (
                 <>
                     <div className={styles.summarySection}>
                         <h2 className={styles.sectionTitle}>Jornada {selectedMatchday}</h2>
@@ -78,7 +72,7 @@ export default function Resultados() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {Object.entries(matchdayData.summary)
+                                    {Object.entries(matchdayData.summary || {})
                                         .sort(([, a], [, b]) => b.points - a.points)
                                         .map(([userId, data]) => (
                                             <tr key={userId}>
@@ -114,14 +108,15 @@ export default function Resultados() {
                                 </div>
 
                                 <div className={styles.betsTable}>
-                                    {matchdayData.users
-                                        .sort(([, a], [, b]) => {
-                                            const ptsA = Object.values(a.bets).filter(bet => bet.correct).length;
-                                            const ptsB = Object.values(b.bets).filter(bet => bet.correct).length;
-                                            return ptsB - ptsA;
+                                    {(matchdayData.users || [])
+                                        .slice()
+                                        .sort((a, b) => {
+                                            const correctA = Object.values(a.bets || {}).filter((bet) => bet.correct).length;
+                                            const correctB = Object.values(b.bets || {}).filter((bet) => bet.correct).length;
+                                            return correctB - correctA;
                                         })
                                         .map((user) => {
-                                            const bet = user.bets[match.matchId];
+                                            const bet = user.bets?.[match.matchId];
                                             if (!bet) return null;
                                             return (
                                                 <div
