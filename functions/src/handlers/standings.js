@@ -18,7 +18,11 @@ exports.getStandings = async (event) => {
         for (const result of results) {
             if (!result.points) continue;
 
-            for (const [userId, data] of result.points) {
+            const entries = result.points instanceof Map
+                ? Array.from(result.points.entries())
+                : Object.entries(result.points);
+
+            for (const [userId, data] of entries) {
                 if (!pointsByUser[userId]) {
                     pointsByUser[userId] = { points: 0, correct: 0 };
                 }
