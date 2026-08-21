@@ -50,8 +50,8 @@ export default {
         });
     },
 
-    async getResults() {
-        return request('/results');
+    async getResults(matchday) {
+        return request(`/results${matchday !== undefined ? `?matchday=${matchday}` : ''}`);
     },
 
     async getStandings() {
