@@ -9,16 +9,57 @@ const HEADERS = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
-function calculatePoints(prediction, actualHomeScore, actualAwayScore) {
-    if (actualHomeScore === null || actualAwayScore === null) return 0;
+function getActualResult(homeScore, awayScore) {
+    if (homeScore > awayScore) return '1';
+    if (homeScore < awayScore) return '2';
+    return 'X';
+}
 
-    let actualResult;
-    if (actualHomeScore > actualAwayScore) actualResult = '1';
-    else if (actualHomeScore < actualAwayScore) actualResult = '2';
-    else actualResult = 'X';
+function calculateMatchdayPoints(bets, matches) {
+    const correctByMatch = {};
+    for (const m of matches) {
+        const result = getActualResult(m.homeScore, m.awayScore);
+        correctByMatch[m.matchId] = {
+            result,
+            correctUsers: [],
+        };
+    }
 
-    if (prediction === actualResult) return 3;
-    return 0;
+    for (const bet of bets) {
+        const matchInfo = correctByMatch[bet.matchId];
+        if (!matchInfo) continue;
+        if (bet.prediction === matchInfo.result) {
+            matchInfo.correctUsers.push(bet.userId);
+        }
+    }
+
+    const usersMap = {};
+    for (const bet of bets) {
+        if (!usersMap[bet.userId]) {
+            usersMap[bet.userId] = { userId: bet.userId, bets: {}, points: 0, correct: 0 };
+        }
+        const matchInfo = correctByMatch[bet.matchId];
+        if (!matchInfo) continue;
+        const correct = bet.prediction === matchInfo.result;
+        usersMap[bet.userId].bets[bet.matchId] = { prediction: bet.prediction, correct };
+        if (correct) {
+            usersMap[bet.userId].points += 3;
+            usersMap[bet.userId].correct += 1;
+        }
+    }
+
+    for (const user of Object.values(usersMap)) {
+        if (user.correct === 10) {
+            user.points = 50;
+        }
+    }
+
+    return {
+        users: Object.values(usersMap),
+        summary: Object.fromEntries(
+            Object.values(usersMap).map((u) => [u.userId, { points: u.points, correct: u.correct }])
+        ),
+    };
 }
 
 exports.getResults = async (event) => {
@@ -28,11 +69,11 @@ exports.getResults = async (event) => {
     try {
         await dbConnect();
 
-        const matches = await Match.find({ status: 'finished' })
+        const finishedMatches = await Match.find({ status: 'finished' })
             .sort({ matchday: -1, date: -1 })
             .lean();
 
-        const resultsByMatchday = matches.reduce((acc, match) => {
+        const resultsByMatchday = finishedMatches.reduce((acc, match) => {
             if (!acc[match.matchday]) acc[match.matchday] = [];
             acc[match.matchday].push(match);
             return acc;
@@ -54,44 +95,12 @@ exports.getResults = async (event) => {
             }
 
             const bets = await Bet.find({ matchday }).lean();
-            const resultEntry = await Result.findOne({ matchday }).lean();
+            const { users, summary } = calculateMatchdayPoints(bets, dayMatches);
 
-            const usersMap = {};
-            for (const bet of bets) {
-                if (!usersMap[bet.userId]) {
-                    usersMap[bet.userId] = { userId: bet.userId, bets: {} };
-                }
-                const match = dayMatches.find((m) => m.matchId === bet.matchId);
-                if (!match) continue;
-                let actualResult;
-                if (match.homeScore > match.awayScore) actualResult = '1';
-                else if (match.homeScore < match.awayScore) actualResult = '2';
-                else actualResult = 'X';
-                const correct = bet.prediction === actualResult;
-                usersMap[bet.userId].bets[bet.matchId] = { prediction: bet.prediction, correct };
-            }
-
-            const users = Object.values(usersMap);
-
-            let summary = {};
-            if (resultEntry && resultEntry.points) {
-                summary = resultEntry.points;
-            } else {
-                for (const user of users) {
-                    if (!summary[user.userId]) summary[user.userId] = { points: 0, correct: 0 };
-                    for (const bet of Object.values(user.bets)) {
-                        if (bet.correct) { summary[user.userId].points += 3; summary[user.userId].correct += 1; }
-                    }
-                }
-            }
-
-            const matchesWithResult = dayMatches.map((m) => {
-                let actualResult;
-                if (m.homeScore > m.awayScore) actualResult = '1';
-                else if (m.homeScore < m.awayScore) actualResult = '2';
-                else actualResult = 'X';
-                return { ...m, result: actualResult };
-            });
+            const matchesWithResult = dayMatches.map((m) => ({
+                ...m,
+                result: getActualResult(m.homeScore, m.awayScore),
+            }));
 
             return {
                 statusCode: 200,
@@ -138,24 +147,10 @@ exports.createResults = async (event) => {
 
         const bets = await Bet.find({ matchday }).lean();
         const matches = await Match.find({ matchday }).lean();
+        const { summary } = calculateMatchdayPoints(bets, matches);
 
-        const pointsMap = {};
-        for (const bet of bets) {
-            const match = matches.find((m) => m.matchId === bet.matchId);
-            if (!match) continue;
-            if (!pointsMap[bet.userId]) pointsMap[bet.userId] = { points: 0, correct: 0 };
-            const points = calculatePoints(bet.prediction, match.homeScore, match.awayScore);
-            pointsMap[bet.userId].points += points;
-            if (points === 3) pointsMap[bet.userId].correct += 1;
-        }
-
-        const resultEntry = await Result.findOne({ matchday });
-        if (resultEntry) {
-            resultEntry.points = pointsMap;
-            await resultEntry.save();
-        } else {
-            await Result.create({ matchday, points: pointsMap });
-        }
+        await Result.deleteMany({ matchday });
+        await Result.create({ matchday, points: summary });
 
         return {
             statusCode: 200,
