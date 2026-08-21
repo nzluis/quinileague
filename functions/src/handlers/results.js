@@ -9,38 +9,36 @@ const HEADERS = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
-function getActualResult(homeScore, awayScore) {
-    if (homeScore > awayScore) return '1';
-    if (homeScore < awayScore) return '2';
+function scoreToResult(score) {
+    if (!score) return null;
+    const [home, away] = score.split('-').map(Number);
+    if (isNaN(home) || isNaN(away)) return null;
+    if (home > away) return '1';
+    if (home < away) return '2';
     return 'X';
 }
 
-function calculateMatchdayPoints(bets, matches) {
-    const correctByMatch = {};
-    for (const m of matches) {
-        const result = getActualResult(m.homeScore, m.awayScore);
-        correctByMatch[m.matchId] = {
-            result,
-            correctUsers: [],
-        };
-    }
-
-    for (const bet of bets) {
-        const matchInfo = correctByMatch[bet.matchId];
-        if (!matchInfo) continue;
-        if (bet.prediction === matchInfo.result) {
-            matchInfo.correctUsers.push(bet.userId);
+function deriveResultFromMatches(matches) {
+    return matches.reduce((acc, m) => {
+        if (m.homeScore !== null && m.awayScore !== null) {
+            acc[m.matchId] = {
+                score: `${m.homeScore}-${m.awayScore}`,
+                result: scoreToResult(`${m.homeScore}-${m.awayScore}`),
+            };
         }
-    }
+        return acc;
+    }, {});
+}
 
+function calculateMatchdayPoints(bets, games) {
     const usersMap = {};
     for (const bet of bets) {
         if (!usersMap[bet.userId]) {
             usersMap[bet.userId] = { userId: bet.userId, bets: {}, points: 0, correct: 0 };
         }
-        const matchInfo = correctByMatch[bet.matchId];
-        if (!matchInfo) continue;
-        const correct = bet.prediction === matchInfo.result;
+        const game = games?.[bet.matchId];
+        if (!game) continue;
+        const correct = bet.prediction === game.result;
         usersMap[bet.userId].bets[bet.matchId] = { prediction: bet.prediction, correct };
         if (correct) {
             usersMap[bet.userId].points += 3;
@@ -87,25 +85,29 @@ exports.getResults = async (event) => {
         if (matchday !== null) {
             const dayMatches = resultsByMatchday[matchday];
             if (!dayMatches || dayMatches.length === 0) {
+                const resultEntry = await Result.findOne({ matchday }).lean();
+                const games = resultEntry?.games || {};
                 return {
                     statusCode: 200,
                     headers: HEADERS,
-                    body: JSON.stringify({ matchday, matches: [], users: [], summary: {} }),
+                    body: JSON.stringify({ matchday, matches: [], users: [], summary: {}, games }),
                 };
             }
 
             const bets = await Bet.find({ matchday }).lean();
-            const { users, summary } = calculateMatchdayPoints(bets, dayMatches);
+            const resultEntry = await Result.findOne({ matchday }).lean();
+            const games = resultEntry?.games || deriveResultFromMatches(dayMatches);
+            const { users, summary } = calculateMatchdayPoints(bets, games);
 
-            const matchesWithResult = dayMatches.map((m) => ({
-                ...m,
-                result: getActualResult(m.homeScore, m.awayScore),
-            }));
+            const matchesWithResult = dayMatches.map((m) => {
+                const game = games[m.matchId];
+                return { ...m, score: game?.score || null, result: game?.result || null };
+            });
 
             return {
                 statusCode: 200,
                 headers: HEADERS,
-                body: JSON.stringify({ matchday, matches: matchesWithResult, users, summary }),
+                body: JSON.stringify({ matchday, matches: matchesWithResult, users, summary, games }),
             };
         }
 
@@ -138,19 +140,20 @@ exports.createResults = async (event) => {
             };
         }
 
-        for (const result of results) {
+        const games = {};
+        for (const r of results) {
             await Match.findOneAndUpdate(
-                { matchId: result.matchId },
-                { homeScore: result.homeScore, awayScore: result.awayScore, status: 'finished' }
+                { matchId: r.matchId },
+                { homeScore: r.homeScore, awayScore: r.awayScore, status: 'finished' }
             );
+            games[r.matchId] = {
+                score: `${r.homeScore}-${r.awayScore}`,
+                result: scoreToResult(`${r.homeScore}-${r.awayScore}`),
+            };
         }
 
-        const bets = await Bet.find({ matchday }).lean();
-        const matches = await Match.find({ matchday }).lean();
-        const { summary } = calculateMatchdayPoints(bets, matches);
-
         await Result.deleteMany({ matchday });
-        await Result.create({ matchday, points: summary });
+        await Result.create({ matchday, games });
 
         return {
             statusCode: 200,
