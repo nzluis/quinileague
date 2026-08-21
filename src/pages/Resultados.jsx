@@ -98,7 +98,7 @@ export default function Resultados() {
                                     <div className={styles.matchInfo}>
                                         <span className={styles.team}>{match.homeTeam}</span>
                                         <span className={styles.score}>
-                                            {match.homeScore} - {match.awayScore}
+                                            {match.score || '?'}
                                         </span>
                                         <span className={styles.team}>{match.awayTeam}</span>
                                     </div>
