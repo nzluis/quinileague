@@ -8,11 +8,11 @@ import {
 } from './betLogic.js';
 
 describe('Deadline Calculation', () => {
-    test('calculateDeadline returns 1 hour before first match', () => {
+    test('calculateDeadline returns 5 minutes before first match', () => {
         const firstMatch = '2026-09-01T21:00:00Z';
         const deadline = calculateDeadline(firstMatch);
 
-        expect(deadline.toISOString()).toBe('2026-09-01T20:00:00.000Z');
+        expect(deadline.toISOString()).toBe('2026-09-01T20:55:00.000Z');
     });
 
     test('calculateDeadline returns null for null input', () => {
