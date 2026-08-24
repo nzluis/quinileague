@@ -9,27 +9,6 @@ const HEADERS = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
-function scoreToResult(score) {
-    if (!score) return null;
-    const [home, away] = score.split('-').map(Number);
-    if (isNaN(home) || isNaN(away)) return null;
-    if (home > away) return '1';
-    if (home < away) return '2';
-    return 'X';
-}
-
-function deriveResultFromMatches(matches) {
-    return matches.reduce((acc, m) => {
-        if (m.homeScore !== null && m.awayScore !== null) {
-            acc[m.matchId] = {
-                score: `${m.homeScore}-${m.awayScore}`,
-                result: scoreToResult(`${m.homeScore}-${m.awayScore}`),
-            };
-        }
-        return acc;
-    }, {});
-}
-
 function calculateMatchdayPoints(bets, games) {
     const usersMap = {};
     for (const bet of bets) {
@@ -67,15 +46,16 @@ exports.getResults = async (event) => {
     try {
         await dbConnect();
 
-        const finishedMatches = await Match.find({ status: 'finished' })
-            .sort({ matchday: -1, date: -1 })
-            .lean();
+        const allResults = await Result.find().lean();
 
-        const resultsByMatchday = finishedMatches.reduce((acc, match) => {
-            if (!acc[match.matchday]) acc[match.matchday] = [];
-            acc[match.matchday].push(match);
-            return acc;
-        }, {});
+        const resultsByMatchday = {};
+        for (const r of allResults) {
+            if (r.games && r.games.size > 0) {
+                const matchIds = Array.from(r.games.keys());
+                const matches = await Match.find({ matchId: { $in: matchIds } }).lean();
+                resultsByMatchday[r.matchday] = matches;
+            }
+        }
 
         const results = Object.entries(resultsByMatchday).map(([md, ms]) => ({
             matchday: parseInt(md),
@@ -86,7 +66,7 @@ exports.getResults = async (event) => {
             const dayMatches = resultsByMatchday[matchday];
             if (!dayMatches || dayMatches.length === 0) {
                 const resultEntry = await Result.findOne({ matchday }).lean();
-                const games = resultEntry?.games || {};
+                const games = resultEntry?.games ? Object.fromEntries(resultEntry.games) : {};
                 return {
                     statusCode: 200,
                     headers: HEADERS,
@@ -96,7 +76,7 @@ exports.getResults = async (event) => {
 
             const bets = await Bet.find({ matchday }).lean();
             const resultEntry = await Result.findOne({ matchday }).lean();
-            const games = resultEntry?.games || deriveResultFromMatches(dayMatches);
+            const games = resultEntry?.games ? Object.fromEntries(resultEntry.games) : {};
             const { users, summary } = calculateMatchdayPoints(bets, games);
 
             const matchesWithResult = dayMatches.map((m) => {
@@ -140,16 +120,18 @@ exports.createResults = async (event) => {
             };
         }
 
-        const games = {};
+        const games = new Map();
         for (const r of results) {
-            await Match.findOneAndUpdate(
-                { matchId: r.matchId },
-                { homeScore: r.homeScore, awayScore: r.awayScore, status: 'finished' }
-            );
-            games[r.matchId] = {
-                score: `${r.homeScore}-${r.awayScore}`,
-                result: scoreToResult(`${r.homeScore}-${r.awayScore}`),
-            };
+            const home = parseInt(r.homeScore);
+            const away = parseInt(r.awayScore);
+            let result;
+            if (home > away) result = '1';
+            else if (home < away) result = '2';
+            else result = 'X';
+            games.set(r.matchId, {
+                score: `${home}-${away}`,
+                result,
+            });
         }
 
         await Result.deleteMany({ matchday });
