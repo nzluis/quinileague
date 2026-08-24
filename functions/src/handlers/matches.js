@@ -54,7 +54,7 @@ exports.getNextMatchday = async (event) => {
             }
 
             const deadline = new Date(firstMatch.date);
-            deadline.setHours(deadline.getHours() - 1);
+            deadline.setMinutes(deadline.getMinutes() - 5);
 
             return {
                 statusCode: 200,
@@ -86,7 +86,7 @@ exports.getNextMatchday = async (event) => {
         }
 
         const deadline = new Date(nextMatch.date);
-        deadline.setHours(deadline.getHours() - 1);
+        deadline.setMinutes(deadline.getMinutes() - 5);
 
         return {
             statusCode: 200,

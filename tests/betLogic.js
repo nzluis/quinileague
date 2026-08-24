@@ -1,7 +1,7 @@
 export function calculateDeadline(firstMatchDate) {
     if (!firstMatchDate) return null;
     const deadline = new Date(firstMatchDate);
-    deadline.setHours(deadline.getHours() - 1);
+    deadline.setMinutes(deadline.getMinutes() - 5);
     return deadline;
 }
 

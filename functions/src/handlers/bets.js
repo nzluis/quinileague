@@ -57,7 +57,7 @@ exports.createBet = async (event) => {
         }
 
         const deadline = new Date(firstMatch.date);
-        deadline.setHours(deadline.getHours() - 1);
+        deadline.setMinutes(deadline.getMinutes() - 5);
 
         if (now > deadline) {
             return {
