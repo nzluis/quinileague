@@ -1,7 +1,7 @@
 {
     "name": "quinileague-functions",
     "version": "1.0.0",
-    "description": "AWS Lambda functions for QuinileaGUE",
+    "description": "AWS Lambda functions for quiniLEAGUE",
     "main": "handler.js",
     "scripts": {
         "test": "jest"

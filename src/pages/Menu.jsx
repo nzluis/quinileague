@@ -12,7 +12,7 @@ export default function Menu() {
     return (
         <div className={styles.container}>
             <div className={styles.hero}>
-                <h1 className={styles.title}>QuinileaGUE</h1>
+                <h1 className={styles.title}>quiniLEAGUE</h1>
                 <p className={styles.subtitle}>La Liga 2026/27</p>
                 <p className={styles.description}>
                     Apuesta por los resultados de cada jornada y compite con tus amigos
