@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import Navbar from './components/Navbar/Navbar';
 import Menu from './pages/Menu';
+import Login from './pages/Login';
 import Apuestas from './pages/Apuestas';
 import Clasificacion from './pages/Clasificacion';
 import Resultados from './pages/Resultados';
@@ -16,9 +17,13 @@ function ProtectedRoute({ children }) {
     return children;
 }
 
-export default function App() {
+function Shell() {
+    const { authStatus } = useAuthenticator();
+
+    if (authStatus === 'unauthenticated') return <Login />;
+
     return (
-        <BrowserRouter>
+        <>
             <Navbar />
             <main className={layoutStyles.main}>
                 <Routes>
@@ -57,6 +62,18 @@ export default function App() {
                     />
                 </Routes>
             </main>
+        </>
+    );
+}
+
+export default function App() {
+    const { authStatus } = useAuthenticator();
+
+    if (authStatus === 'configuring') return <Spinner height="100vh" />;
+
+    return (
+        <BrowserRouter>
+            <Shell />
         </BrowserRouter>
     );
 }
