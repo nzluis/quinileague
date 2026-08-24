@@ -4,11 +4,9 @@ export const USERS = {
 };
 
 export const USER_NAMES = {
-    'luis': 'Luis',
     'admin': 'Administrador',
-    'pepito': 'Pepito',
-    'mari-carmen': 'Mari Carmen',
     '1199101e-40c1-70ed-9b79-2ce016b38691': 'Luis',
+    '2199d01e-f091-70fc-478d-9027588363a6': 'Huguito'
 };
 
 export const PREDICTION_LABELS = {
