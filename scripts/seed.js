@@ -21,6 +21,11 @@ const matchSchema = new mongoose.Schema({
 const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);
 
 const ALL_MATCHES = [
+    { matchday: 0, date: '2026-08-10T19:00:00Z', home: 'Barcelona', away: 'Real Madrid' },
+    { matchday: 0, date: '2026-08-10T21:00:00Z', home: 'Atlético', away: 'Sevilla' },
+    { matchday: 0, date: '2026-08-10T19:00:00Z', home: 'Athletic', away: 'Betis' },
+    { matchday: 0, date: '2026-08-10T21:00:00Z', home: 'Valencia', away: 'Málaga' },
+
     { matchday: 1, date: '2026-08-16T17:00:00Z', home: 'Alavés', away: 'Getafe' },
     { matchday: 1, date: '2026-08-16T19:00:00Z', home: 'Atlético', away: 'Málaga' },
     { matchday: 1, date: '2026-08-16T21:30:00Z', home: 'Celta', away: 'Osasuna' },
