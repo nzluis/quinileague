@@ -28,12 +28,14 @@ export default {
       });
     }
 
+    const body = request.method !== 'GET' && request.method !== 'OPTIONS' ? await request.text() : undefined;
+
     const response = await fetch(apiUrl, {
       method: request.method,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: request.method !== 'GET' ? request.text() : undefined,
+      body,
     });
 
     const responseHeaders = new Headers();

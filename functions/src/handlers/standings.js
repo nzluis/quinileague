@@ -97,7 +97,7 @@ exports.getStandings = async (event) => {
         const standings = Object.entries(pointsByUser)
             .map(([userId, data]) => ({
                 userId,
-                userName: userId,
+                userName: userId.length > 12 ? userId.substring(0, 8) + '...' : userId,
                 points: data.points,
                 correct: data.correct,
             }))
