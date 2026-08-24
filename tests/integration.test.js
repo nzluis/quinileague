@@ -15,7 +15,7 @@ async function testEndpoint(method, path, body = null) {
 }
 
 async function runTests() {
-    console.log('=== Integration Tests for QuinileaGUE API ===\n');
+    console.log('=== Integration Tests for quiniLEAGUE API ===\n');
 
     let passed = 0;
     let failed = 0;

@@ -17,7 +17,7 @@ export default function Navbar() {
             <div className={styles.brand}>
                 <Link to="/" onClick={() => setMenuOpen(false)}>
                     <span className={styles.logo}>⚽</span>
-                    <span>QuinileaGUE</span>
+                    <span>quiniLEAGUE</span>
                 </Link>
                 <button
                     className={styles.hamburger}
