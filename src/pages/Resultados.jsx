@@ -39,19 +39,15 @@ export default function Resultados() {
     return (
         <div className={styles.container}>
             <div className={styles.indexBar}>
-                {!hasMatchdays ? (
-                    <span className={styles.noData}>No hay resultados aún</span>
-                ) : (
-                    availableMatchdays.map((n) => (
-                        <button
-                            key={n}
-                            className={`${styles.indexBtn} ${n === selectedMatchday ? styles.indexBtnActive : ''}`}
-                            onClick={() => setSelectedMatchday(n)}
-                        >
-                            {n}
-                        </button>
-                    ))
-                )}
+                {hasMatchdays && availableMatchdays.map((n) => (
+                    <button
+                        key={n}
+                        className={`${styles.indexBtn} ${n === selectedMatchday ? styles.indexBtnActive : ''}`}
+                        onClick={() => setSelectedMatchday(n)}
+                    >
+                        {n}
+                    </button>
+                ))}
             </div>
 
             {!hasMatchdays ? (
