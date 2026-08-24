@@ -58,11 +58,10 @@ export default function Navbar() {
                         </Link>
                     </li>
                 </ul>
+                <button onClick={logout} className={styles.signOut}>
+                    Salir
+                </button>
             </div>
-
-            <button onClick={logout} className={styles.signOut}>
-                Salir
-            </button>
 
             {menuOpen && (
                 <div className={styles.overlay} onClick={() => setMenuOpen(false)} />
