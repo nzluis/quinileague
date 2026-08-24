@@ -55,7 +55,7 @@ export default function Resultados() {
             </div>
 
             {!hasMatchdays ? (
-                <Spinner height="40vh" />
+                <p className={styles.empty}>No hay matchdays con resultados</p>
             ) : loading ? (
                 <Spinner height="40vh" />
             ) : matchdayData?.matches?.length > 0 ? (

@@ -45,7 +45,7 @@ const J0_RESULTS = {
     j0_m4: { score: '3-0', result: '1' },
 };
 
-const USERS = ['user_alberto', 'user_luis', 'user_maria', 'user_carlos', 'user_ana'];
+const USERS = ['user_alberto', 'user_luis', 'user_maria', 'user_carlos', 'user_ana', '1199101e-40c1-70ed-9b79-2ce016b38691'];
 
 const BETS = {
     user_alberto: { j0_m1: '1', j0_m2: 'X', j0_m3: '2', j0_m4: '1' },
@@ -53,6 +53,7 @@ const BETS = {
     user_maria: { j0_m1: '2', j0_m2: 'X', j0_m3: '2', j0_m4: '1' },
     user_carlos: { j0_m1: '1', j0_m2: '1', j0_m3: '2', j0_m4: '2' },
     user_ana: { j0_m1: '2', j0_m2: '2', j0_m3: '1', j0_m4: 'X' },
+    '1199101e-40c1-70ed-9b79-2ce016b38691': { j0_m1: '1', j0_m2: 'X', j0_m3: '2', j0_m4: '1' },
 };
 
 async function seedTestData() {
