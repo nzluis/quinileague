@@ -37,6 +37,14 @@
     font-size: 0.95rem;
 }
 
+.table td:nth-child(2) {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-word;
+}
+
 .table tr:not(:last-child) td {
     border-bottom: 1px solid #eee;
 }
