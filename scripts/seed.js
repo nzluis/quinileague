@@ -18,6 +18,7 @@ const matchSchema = new mongoose.Schema({
 const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);
 
 const ALL_MATCHES = [
+    // J0 — test data removed from DB, kept here to preserve matchId ordering
     { matchday: 0, date: '2026-08-10T19:00:00Z', home: 'Barcelona', away: 'Real Madrid' },
     { matchday: 0, date: '2026-08-10T21:00:00Z', home: 'Atlético', away: 'Sevilla' },
     { matchday: 0, date: '2026-08-10T19:00:00Z', home: 'Athletic', away: 'Betis' },
