@@ -1,5 +1,4 @@
 const dbConnect = require('../services/db');
-const Match = require('../services/matchModel');
 const Bet = require('../services/betModel');
 const Result = require('../services/resultModel');
 
@@ -13,45 +12,39 @@ exports.getStandings = async (event) => {
     try {
         await dbConnect();
 
-        const finishedMatches = await Match.find({ status: 'finished' }).lean();
         const resultDocs = await Result.find().lean();
 
         const resultGames = {};
+        const gamesCountByMatchday = {};
+        const matchdays = [];
+
         for (const doc of resultDocs) {
             if (doc.games) {
                 const entries = doc.games instanceof Map
                     ? Array.from(doc.games.entries())
                     : Object.entries(doc.games);
+                if (entries.length === 0) continue;
+                matchdays.push(doc.matchday);
+                gamesCountByMatchday[doc.matchday] = entries.length;
                 for (const [matchId, game] of entries) {
                     resultGames[matchId] = game;
                 }
             }
         }
 
-        const matchdays = [...new Set(finishedMatches.map((m) => m.matchday))];
-
         const allBets = await Bet.find({}).lean();
 
         const pointsByUser = {};
 
         for (const matchday of matchdays) {
-            const dayMatches = finishedMatches.filter((m) => m.matchday === matchday);
             const dayBets = allBets.filter((b) => b.matchday === matchday);
-
-            const games = {};
-            for (const m of dayMatches) {
-                const fromResult = resultGames[m.matchId];
-                if (fromResult) {
-                    games[m.matchId] = fromResult;
-                }
-            }
 
             const userPoints = {};
             for (const bet of dayBets) {
                 if (!userPoints[bet.userId]) {
                     userPoints[bet.userId] = { points: 0, correct: 0 };
                 }
-                const game = games[bet.matchId];
+                const game = resultGames[bet.matchId];
                 if (!game) continue;
                 if (bet.prediction === game.result) {
                     userPoints[bet.userId].points += 3;
@@ -59,8 +52,9 @@ exports.getStandings = async (event) => {
                 }
             }
 
+            const totalGames = gamesCountByMatchday[matchday];
             for (const user of Object.values(userPoints)) {
-                if (user.correct === 10) {
+                if (totalGames > 0 && user.correct === totalGames) {
                     user.points = 50;
                 }
             }

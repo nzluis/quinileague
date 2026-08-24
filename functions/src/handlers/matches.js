@@ -1,5 +1,6 @@
 const dbConnect = require('../services/db');
 const Match = require('../services/matchModel');
+const Result = require('../services/resultModel');
 
 const HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -66,9 +67,12 @@ exports.getNextMatchday = async (event) => {
             };
         }
 
+        const resultDocs = await Result.find().lean();
+        const finishedMatchdays = new Set(resultDocs.map((r) => r.matchday));
+
         const nextMatch = await Match.findOne({
             date: { $gt: now },
-            status: 'scheduled',
+            matchday: { $nin: Array.from(finishedMatchdays) },
         })
             .sort({ date: 1 })
             .lean();
