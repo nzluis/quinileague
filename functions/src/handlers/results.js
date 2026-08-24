@@ -50,8 +50,9 @@ exports.getResults = async (event) => {
 
         const resultsByMatchday = {};
         for (const r of allResults) {
-            if (r.games && r.games.size > 0) {
-                const matchIds = Array.from(r.games.keys());
+            const games = r.games instanceof Map ? Object.fromEntries(r.games) : r.games;
+            if (games && Object.keys(games).length > 0) {
+                const matchIds = Object.keys(games);
                 const matches = await Match.find({ matchId: { $in: matchIds } }).lean();
                 resultsByMatchday[r.matchday] = matches;
             }
@@ -66,7 +67,9 @@ exports.getResults = async (event) => {
             const dayMatches = resultsByMatchday[matchday];
             if (!dayMatches || dayMatches.length === 0) {
                 const resultEntry = await Result.findOne({ matchday }).lean();
-                const games = resultEntry?.games ? Object.fromEntries(resultEntry.games) : {};
+                const games = resultEntry?.games 
+                    ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games) 
+                    : {};
                 return {
                     statusCode: 200,
                     headers: HEADERS,
@@ -76,7 +79,9 @@ exports.getResults = async (event) => {
 
             const bets = await Bet.find({ matchday }).lean();
             const resultEntry = await Result.findOne({ matchday }).lean();
-            const games = resultEntry?.games ? Object.fromEntries(resultEntry.games) : {};
+            const games = resultEntry?.games 
+                ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games) 
+                : {};
             const { users, summary } = calculateMatchdayPoints(bets, games);
 
             const matchesWithResult = dayMatches.map((m) => {
