@@ -13,9 +13,6 @@ const matchSchema = new mongoose.Schema({
     date: { type: Date, required: true },
     homeTeam: { type: String, required: true },
     awayTeam: { type: String, required: true },
-    homeScore: { type: Number, default: null },
-    awayScore: { type: Number, default: null },
-    status: { type: String, enum: ['scheduled', 'finished'], default: 'scheduled' },
 }, { timestamps: true });
 
 const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);

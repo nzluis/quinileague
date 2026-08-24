@@ -9,21 +9,6 @@ const HEADERS = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
-function deriveResultFromMatches(matches) {
-    return matches.reduce((acc, m) => {
-        if (m.homeScore !== null && m.awayScore !== null) {
-            const home = m.homeScore;
-            const away = m.awayScore;
-            let result;
-            if (home > away) result = '1';
-            else if (home < away) result = '2';
-            else result = 'X';
-            acc[m.matchId] = { score: `${home}-${away}`, result };
-        }
-        return acc;
-    }, {});
-}
-
 exports.getStandings = async (event) => {
     try {
         await dbConnect();
@@ -58,11 +43,6 @@ exports.getStandings = async (event) => {
                 const fromResult = resultGames[m.matchId];
                 if (fromResult) {
                     games[m.matchId] = fromResult;
-                } else if (m.homeScore !== null && m.awayScore !== null) {
-                    games[m.matchId] = {
-                        score: `${m.homeScore}-${m.awayScore}`,
-                        result: m.homeScore > m.awayScore ? '1' : m.homeScore < m.awayScore ? '2' : 'X',
-                    };
                 }
             }
 

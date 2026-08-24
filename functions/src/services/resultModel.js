@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 
 const resultSchema = new mongoose.Schema({
     matchday: { type: Number, required: true, unique: true },
-    points: {
+    games: {
         type: Map,
         of: {
-            points: Number,
-            correct: Number,
+            score: String,
+            result: String,
         },
         default: {},
     },
