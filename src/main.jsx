@@ -16,8 +16,8 @@ Amplify.configure({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <Authenticator>
+        <Authenticator.Provider>
             <App />
-        </Authenticator>
+        </Authenticator.Provider>
     </React.StrictMode>
 );
