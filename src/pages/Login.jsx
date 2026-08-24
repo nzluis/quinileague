@@ -36,8 +36,10 @@ export default function Login() {
         setNotice('');
         setLoading(true);
         try {
-            await signIn({ username: username.trim(), password });
-            // Authenticator.Provider detecta el evento de sesión y actualiza authStatus
+            const { isSignedIn } = await signIn({ username: username.trim(), password });
+            if (isSignedIn) {
+                window.location.reload();
+            }
         } catch (err) {
             setError(errorMessage(err));
             setLoading(false);
