@@ -74,7 +74,7 @@ export default function Resultados() {
                                             <tr key={userId}>
                                                 <td className={styles.userName}>{getDisplayName(userId)}</td>
                                                 <td className={styles.points}>{data.points}</td>
-                                                <td className={styles.correct}>{data.correct}/{matchdayData.matches.length}</td>
+                                                <td className={styles.correct}>{data.correct}</td>
                                             </tr>
                                         ))}
                                 </tbody>
