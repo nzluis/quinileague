@@ -13,9 +13,6 @@ const matchSchema = new mongoose.Schema({
     date: Date,
     homeTeam: String,
     awayTeam: String,
-    homeScore: Number,
-    awayScore: Number,
-    status: String,
 });
 
 const betSchema = new mongoose.Schema({
@@ -27,7 +24,7 @@ const betSchema = new mongoose.Schema({
 
 const resultSchema = new mongoose.Schema({
     matchday: Number,
-    points: Map,
+    games: Map,
 });
 
 const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);
@@ -35,11 +32,18 @@ const Bet = mongoose.models.Bet || mongoose.model('Bet', betSchema);
 const Result = mongoose.models.Result || mongoose.model('Result', resultSchema);
 
 const J0_MATCHES = [
-    { matchId: 'j0_m1', homeTeam: 'Barcelona', awayTeam: 'Real Madrid', homeScore: 2, awayScore: 1 },
-    { matchId: 'j0_m2', homeTeam: 'Atlético', awayTeam: 'Sevilla', homeScore: 1, awayScore: 1 },
-    { matchId: 'j0_m3', homeTeam: 'Athletic', awayTeam: 'Betis', homeScore: 0, awayScore: 2 },
-    { matchId: 'j0_m4', homeTeam: 'Valencia', awayTeam: 'Málaga', homeScore: 3, awayScore: 0 },
+    { matchId: 'j0_m1', homeTeam: 'Barcelona', awayTeam: 'Real Madrid' },
+    { matchId: 'j0_m2', homeTeam: 'Atlético', awayTeam: 'Sevilla' },
+    { matchId: 'j0_m3', homeTeam: 'Athletic', awayTeam: 'Betis' },
+    { matchId: 'j0_m4', homeTeam: 'Valencia', awayTeam: 'Málaga' },
 ];
+
+const J0_RESULTS = {
+    j0_m1: { score: '2-1', result: '1' },
+    j0_m2: { score: '1-1', result: 'X' },
+    j0_m3: { score: '0-2', result: '2' },
+    j0_m4: { score: '3-0', result: '1' },
+};
 
 const USERS = ['user_alberto', 'user_luis', 'user_maria', 'user_carlos', 'user_ana'];
 
@@ -51,56 +55,34 @@ const BETS = {
     user_ana: { j0_m1: '2', j0_m2: '2', j0_m3: '1', j0_m4: 'X' },
 };
 
-const CORRECT = { j0_m1: '1', j0_m2: 'X', j0_m3: '2', j0_m4: '1' };
-
 async function seedTestData() {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
 
-    for (const m of J0_MATCHES) {
-        await Match.updateOne(
-            { matchId: m.matchId },
-            { homeScore: m.homeScore, awayScore: m.awayScore, status: 'finished' },
-            { upsert: true }
-        );
-        console.log(`Match ${m.matchId}: ${m.homeTeam} ${m.homeScore}-${m.awayScore} ${m.awayTeam}`);
-    }
-
     await Bet.deleteMany({ matchday: 0 });
+    console.log('Cleared J0 bets');
+
+    await Result.deleteOne({ matchday: 0 });
 
     for (const userId of USERS) {
         for (const [matchId, prediction] of Object.entries(BETS[userId])) {
             await Bet.create({ userId, matchday: 0, matchId, prediction });
         }
-        const correct = Object.values(BETS[userId]).filter((p, i) => p === Object.values(CORRECT)[i]).length;
+        const correct = Object.values(BETS[userId]).filter((p, i) => {
+            const matchId = Object.keys(BETS[userId])[i];
+            return p === J0_RESULTS[matchId].result;
+        }).length;
         console.log(`Bets for ${userId}: ${correct}/4 correct`);
     }
 
-    const resultPoints = {};
-    for (const userId of USERS) {
-        const bets = await Bet.find({ userId, matchday: 0 }).lean();
-        let points = 0, correct = 0;
-        for (const bet of bets) {
-            if (CORRECT[bet.matchId] === bet.prediction) {
-                points += 3;
-                correct += 1;
-            }
-        }
-        if (correct === 4) points = 50;
-        resultPoints[userId] = { points, correct };
-    }
-
-    await Result.deleteOne({ matchday: 0 });
-    await Result.create({ matchday: 0, points: resultPoints });
-
-    console.log('\n=== Standings ===');
-    const standings = Object.entries(resultPoints)
-        .map(([userId, data]) => ({ userId, ...data }))
-        .sort((a, b) => b.points - a.points);
-
-    standings.forEach((s, i) => {
-        console.log(`${i + 1}. ${s.userId}: ${s.points} pts, ${s.correct} aciertos`);
+    await Result.create({
+        matchday: 0,
+        games: J0_RESULTS,
     });
+    console.log('\nJ0 Result created with games:');
+    for (const [matchId, game] of Object.entries(J0_RESULTS)) {
+        console.log(`  ${matchId}: ${game.score} (${game.result})`);
+    }
 
     await mongoose.disconnect();
     console.log('\nDone');
