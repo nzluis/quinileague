@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar() {
-    const { route, signOut } = useAuthenticator();
+    const { user, logout } = useAuth();
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
 
-    if (route !== 'authenticated') return null;
+    if (!user) return null;
 
     return (
         <nav className={styles.navbar}>
@@ -58,7 +58,7 @@ export default function Navbar() {
                         </Link>
                     </li>
                     <li>
-                        <button onClick={signOut} className={styles.signOut}>
+                        <button onClick={logout} className={styles.signOut}>
                             Salir
                         </button>
                     </li>

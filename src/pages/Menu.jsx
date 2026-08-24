@@ -1,13 +1,11 @@
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 import styles from './Menu.module.css';
 
 export default function Menu() {
-    const { authStatus } = useAuthenticator();
+    const { user } = useAuth();
 
-    if (authStatus === 'authenticated') {
-        window.location.href = '/apuestas';
-        return null;
-    }
+    if (user) return <Navigate to="/apuestas" replace />;
 
     return (
         <div className={styles.container}>
