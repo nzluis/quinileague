@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuth } from '../context/AuthContext';
 import MatchCard from '../components/MatchCard/MatchCard';
 import Spinner from '../components/Spinner/Spinner';
 import toast from 'react-hot-toast';
@@ -9,7 +9,7 @@ import styles from './Apuestas.module.css';
 const TOTAL_MATCHDAYS = 38;
 
 export default function Apuestas() {
-    const { user } = useAuthenticator();
+    const { user } = useAuth();
     const [selectedMatchday, setSelectedMatchday] = useState(undefined);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);

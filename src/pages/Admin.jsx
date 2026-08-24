@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import styles from './Admin.module.css';
@@ -7,7 +7,7 @@ import styles from './Admin.module.css';
 const ADMIN_USERS = ['luis', 'admin'];
 
 export default function Admin() {
-    const { user } = useAuthenticator();
+    const { user } = useAuth();
     const [matchday, setMatchday] = useState(1);
     const [results, setResults] = useState({});
     const [submitting, setSubmitting] = useState(false);

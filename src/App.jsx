@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar/Navbar';
 import Menu from './pages/Menu';
 import Login from './pages/Login';
@@ -11,16 +11,17 @@ import Spinner from './components/Spinner/Spinner';
 import layoutStyles from './Layout.module.css';
 
 function ProtectedRoute({ children }) {
-    const { authStatus } = useAuthenticator();
-    if (authStatus === 'configuring') return <Spinner />;
-    if (authStatus !== 'authenticated') return <Navigate to="/" replace />;
+    const { user, loading } = useAuth();
+    if (loading) return <Spinner />;
+    if (!user) return <Navigate to="/" replace />;
     return children;
 }
 
 function Shell() {
-    const { authStatus } = useAuthenticator();
+    const { user, loading } = useAuth();
 
-    if (authStatus === 'unauthenticated') return <Login />;
+    if (loading) return <Spinner height="100vh" />;
+    if (!user) return <Login />;
 
     return (
         <>
@@ -67,10 +68,6 @@ function Shell() {
 }
 
 export default function App() {
-    const { authStatus } = useAuthenticator();
-
-    if (authStatus === 'configuring') return <Spinner height="100vh" />;
-
     return (
         <BrowserRouter>
             <Shell />
