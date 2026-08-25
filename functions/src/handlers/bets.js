@@ -45,6 +45,14 @@ exports.createBet = async (event) => {
             };
         }
 
+        if (bets.length !== 10) {
+            return {
+                statusCode: 400,
+                headers: HEADERS,
+                body: JSON.stringify({ error: 'Debes seleccionar exactamente 10 partidos' }),
+            };
+        }
+
         const now = new Date();
         const firstMatch = await Match.findOne({ matchday }).sort({ date: 1 }).lean();
 
