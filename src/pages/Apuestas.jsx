@@ -89,7 +89,7 @@ export default function Apuestas() {
             });
             toast.success('Apuestas guardadas');
         } catch (error) {
-            toast.error('Error guardando apuestas');
+            toast.error(error.message || 'Error guardando apuestas');
         } finally {
             setSubmitting(false);
         }
@@ -144,7 +144,7 @@ export default function Apuestas() {
                     {!isLocked && (
                         <button
                             onClick={handleSubmit}
-                            disabled={submitting || Object.keys(bets).length === 0}
+                            disabled={submitting || Object.keys(bets).length !== 10}
                             className={styles.submitBtn}
                         >
                             {submitting ? 'Guardando...' : 'Guardar Apuestas'}
