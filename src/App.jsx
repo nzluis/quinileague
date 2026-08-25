@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar/Navbar';
 import Menu from './pages/Menu';
 import Login from './pages/Login';
@@ -63,6 +64,7 @@ function Shell() {
                     />
                 </Routes>
             </main>
+            <Toaster />
         </>
     );
 }
