@@ -27,7 +27,7 @@ function calculateMatchdayPoints(bets, games) {
 
     for (const user of Object.values(usersMap)) {
         if (user.correct === 10) {
-            user.points = 50;
+            user.points = 40;
         }
     }
 

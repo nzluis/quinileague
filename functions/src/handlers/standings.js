@@ -55,7 +55,7 @@ exports.getStandings = async (event) => {
             const totalGames = gamesCountByMatchday[matchday];
             for (const user of Object.values(userPoints)) {
                 if (totalGames > 0 && user.correct === totalGames) {
-                    user.points = 50;
+                    user.points = 40;
                 }
             }
 
