@@ -4,7 +4,7 @@ import { showError, showSuccess } from '../utils/toast';
 import api from '../utils/api';
 import styles from './Admin.module.css';
 
-const ADMIN_USERS = ['luis', 'admin'];
+const ADMIN_USERS = ['luis', 'admin', 'aguakiko@gmail.com'];
 
 export default function Admin() {
     const { user } = useAuth();
