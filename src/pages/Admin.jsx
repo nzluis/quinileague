@@ -7,7 +7,7 @@ import styles from './Admin.module.css';
 
 export default function Admin() {
     const { user } = useAuth();
-    const [matchday, setMatchday] = useState(1);
+    const [matchday, setMatchday] = useState(undefined);
     const [matches, setMatches] = useState([]);
     const [results, setResults] = useState({});
     const [loading, setLoading] = useState(false);
@@ -22,7 +22,15 @@ export default function Admin() {
     }
 
     useEffect(() => {
-        fetchMatchday(matchday);
+        if (matchday !== undefined) {
+            fetchMatchday(matchday);
+        } else {
+            api.getNextMatchday().then((res) => {
+                setMatchday(res.matchday || 1);
+            }).catch(() => {
+                setMatchday(1);
+            });
+        }
     }, [matchday]);
 
     const fetchMatchday = async (md) => {
