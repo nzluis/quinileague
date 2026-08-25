@@ -14,3 +14,5 @@ export const PREDICTION_LABELS = {
     'X': 'Empate',
     '2': 'Victoria visitante',
 };
+
+export const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];

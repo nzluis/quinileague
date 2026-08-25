@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { showError, showSuccess } from '../utils/toast';
+import { ADMIN_USERS } from '../utils/constants';
 import api from '../utils/api';
 import styles from './Admin.module.css';
-
-const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];
 
 export default function Admin() {
     const { user } = useAuth();

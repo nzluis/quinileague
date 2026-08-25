@@ -2,8 +2,7 @@ import { useState } from 'react';
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];
+import { ADMIN_USERS } from '../../utils/constants';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
