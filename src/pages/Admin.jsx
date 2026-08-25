@@ -35,11 +35,13 @@ export default function Admin() {
             setMatches(matchesRes.matches || []);
 
             const existingResults = {};
-            if (resultsRes.games) {
-                Object.entries(resultsRes.games).forEach(([matchId, game]) => {
-                    const [home, away] = game.score.split('-');
-                    existingResults[matchId] = { home: parseInt(home), away: parseInt(away) };
-                });
+            for (const match of matchesRes.matches || []) {
+                if (resultsRes.games?.[match.matchId]) {
+                    const [home, away] = resultsRes.games[match.matchId].score.split('-');
+                    existingResults[match.matchId] = { home: parseInt(home), away: parseInt(away) };
+                } else {
+                    existingResults[match.matchId] = { home: 0, away: 0 };
+                }
             }
             setResults(existingResults);
         } catch (error) {
@@ -93,11 +95,6 @@ export default function Admin() {
         return r && (r.home >= 0 || r.away >= 0);
     });
 
-    const hasAnyScore = matches.some((m) => {
-        const r = results[m.matchId];
-        return r && (r.home > 0 || r.away > 0);
-    });
-
     return (
         <div className={styles.container}>
             <h1>Admin - Introducir Resultados</h1>
@@ -143,18 +140,16 @@ export default function Admin() {
                                         type="number"
                                         min="0"
                                         className={styles.scoreInput}
-                                        value={results[match.matchId]?.home ?? ''}
+                                        value={results[match.matchId]?.home ?? 0}
                                         onChange={(e) => handleScoreChange(match.matchId, 'home', e.target.value)}
-                                        placeholder="0"
                                     />
                                     <span className={styles.scoreSeparator}>-</span>
                                     <input
                                         type="number"
                                         min="0"
                                         className={styles.scoreInput}
-                                        value={results[match.matchId]?.away ?? ''}
+                                        value={results[match.matchId]?.away ?? 0}
                                         onChange={(e) => handleScoreChange(match.matchId, 'away', e.target.value)}
-                                        placeholder="0"
                                     />
                                 </div>
                             </div>
@@ -163,7 +158,7 @@ export default function Admin() {
 
                     <button
                         onClick={handleSubmit}
-                        disabled={submitting || !allScoresEntered || !hasAnyScore}
+                        disabled={submitting || !allScoresEntered}
                         className={styles.submitBtn}
                     >
                         {submitting ? 'Guardando...' : 'Guardar Resultados'}
