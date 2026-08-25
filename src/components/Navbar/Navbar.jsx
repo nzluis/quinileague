@@ -3,12 +3,15 @@ import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];
+
 export default function Navbar() {
     const { user, logout } = useAuth();
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
+    const isAdmin = ADMIN_USERS.includes(user?.username);
 
     if (!user) return null;
 
@@ -57,6 +60,17 @@ export default function Navbar() {
                             Clasificación
                         </Link>
                     </li>
+                    {isAdmin && (
+                        <li>
+                            <Link
+                                to="/admin"
+                                className={isActive('/admin') ? styles.active : ''}
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Subir Resultados
+                            </Link>
+                        </li>
+                    )}
                 </ul>
                 <button onClick={logout} className={styles.signOut}>
                     Salir
