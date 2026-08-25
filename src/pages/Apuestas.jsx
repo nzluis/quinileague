@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import MatchCard from '../components/MatchCard/MatchCard';
 import Spinner from '../components/Spinner/Spinner';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '../utils/toast';
 import api from '../utils/api';
 import styles from './Apuestas.module.css';
 
@@ -61,7 +61,7 @@ export default function Apuestas() {
             setBets(userBets);
         } catch (error) {
             console.error(error);
-            toast.error('Error cargando datos');
+            showError('Error cargando datos');
         } finally {
             setLoading(false);
         }
@@ -73,7 +73,7 @@ export default function Apuestas() {
 
     const handleSubmit = async () => {
         if (isLocked) {
-            toast.error('El plazo ha expirado');
+            showError('El plazo ha expirado');
             return;
         }
 
@@ -87,9 +87,9 @@ export default function Apuestas() {
                     prediction,
                 })),
             });
-            toast.success('Apuestas guardadas');
+            showSuccess('Apuestas guardadas');
         } catch (error) {
-            toast.error(error.message || 'Error guardando apuestas');
+            showError(error.message || 'Error guardando apuestas');
         } finally {
             setSubmitting(false);
         }

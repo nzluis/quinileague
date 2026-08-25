@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import toast from 'react-hot-toast';
+import { showError, showSuccess } from '../utils/toast';
 import api from '../utils/api';
 import styles from './Admin.module.css';
 
@@ -36,10 +36,10 @@ export default function Admin() {
                 awayScore: score.away,
             }));
             await api.submitResults(matchday, formattedResults);
-            toast.success('Resultados guardados');
+            showSuccess('Resultados guardados');
             setResults({});
         } catch (error) {
-            toast.error('Error guardando resultados');
+            showError(error.message || 'Error guardando resultados');
         } finally {
             setSubmitting(false);
         }
