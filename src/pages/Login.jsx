@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signIn, resetPassword, confirmResetPassword } from 'aws-amplify/auth';
+import { signIn, resetPassword, confirmResetPassword, confirmSignIn } from 'aws-amplify/auth';
 import styles from './Login.module.css';
 
 const ERROR_MESSAGES = {
@@ -23,6 +23,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
     const [loading, setLoading] = useState(false);
+    const [needsNewPassword, setNeedsNewPassword] = useState(false);
 
     function switchView(next) {
         setView(next);
@@ -36,7 +37,26 @@ export default function Login() {
         setNotice('');
         setLoading(true);
         try {
-            const { isSignedIn } = await signIn({ username: username.trim(), password });
+            const { isSignedIn, nextStep } = await signIn({ username: username.trim(), password });
+            if (isSignedIn) {
+                window.location.reload();
+            }
+            if (nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+                setNeedsNewPassword(true);
+                setLoading(false);
+            }
+        } catch (err) {
+            setError(errorMessage(err));
+            setLoading(false);
+        }
+    }
+
+    async function handleConfirmSignIn(e) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            const { isSignedIn } = await confirmSignIn({ challengeResponse: newPassword });
             if (isSignedIn) {
                 window.location.reload();
             }
@@ -97,7 +117,7 @@ export default function Login() {
                     <p className={styles.subtitle}>La Liga 2026/27</p>
                 </div>
 
-                {view === 'signIn' && (
+                {view === 'signIn' && !needsNewPassword && (
                     <form onSubmit={handleSignIn} className={styles.form}>
                         <label className={styles.field}>
                             <span className={styles.label}>Usuario</span>
@@ -139,6 +159,47 @@ export default function Login() {
                             onClick={() => switchView('forgot')}
                         >
                             ¿Olvidaste tu contraseña?
+                        </button>
+                    </form>
+                )}
+
+                {needsNewPassword && (
+                    <form onSubmit={handleConfirmSignIn} className={styles.form}>
+                        <p className={styles.helpText}>
+                            Debes establecer una nueva contraseña para completar tu registro.
+                        </p>
+                        <label className={styles.field}>
+                            <span className={styles.label}>Nueva contraseña</span>
+                            <input
+                                className={styles.input}
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                autoComplete="new-password"
+                                autoFocus
+                                required
+                            />
+                        </label>
+
+                        {error && <p className={styles.error} role="alert">{error}</p>}
+
+                        <button
+                            type="submit"
+                            className={styles.submitBtn}
+                            disabled={loading || !newPassword}
+                        >
+                            {loading ? 'Guardando…' : 'Establecer contraseña'}
+                        </button>
+                        <button
+                            type="button"
+                            className={styles.linkBtn}
+                            onClick={() => {
+                                setNeedsNewPassword(false);
+                                setNewPassword('');
+                                setError('');
+                            }}
+                        >
+                            Volver
                         </button>
                     </form>
                 )}
