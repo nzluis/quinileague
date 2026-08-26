@@ -54,21 +54,26 @@
     height: 44px;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
-    background: white;
+    background-color: white;
     font-weight: 700;
     font-size: 1rem;
     transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .predBtn:hover:not(:disabled) {
     border-color: var(--primary);
-    background: #f0f9f0;
+    background-color: #f0f9f0;
 }
 
-.predBtn.selected {
-    background: var(--primary);
+.predBtn.selected,
+.predBtn.selected:hover,
+.predBtn.selected:focus,
+.predBtn.selected:active {
+    background-color: var(--primary);
     border-color: var(--primary);
     color: white;
+    outline: none;
 }
 
 .predBtn:disabled {
