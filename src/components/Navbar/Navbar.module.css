@@ -116,6 +116,7 @@
     cursor: pointer;
     transition: background 0.2s;
     width: 100%;
+    line-height: 1;
 }
 
 .adminBtn:hover {
@@ -127,16 +128,21 @@
 }
 
 .adminDropdown {
-    display: none;
+    display: flex;
     flex-direction: column;
     list-style: none;
     padding: 0;
     margin: 0;
     background: rgba(0, 0, 0, 0.2);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 
 .dropdownOpen {
-    display: flex;
+    max-height: 200px;
+    opacity: 1;
 }
 
 .adminDropdown li {
@@ -231,6 +237,7 @@
         border-radius: 6px;
         font-size: 0.95rem;
         width: auto;
+        line-height: 1;
     }
 
     .adminBtn:hover {
