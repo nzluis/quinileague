@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react';
 import Spinner from '../components/Spinner/Spinner';
 import api from '../utils/api';
+import { USER_NAMES } from '../utils/constants';
 import styles from './Clasificacion.module.css';
+
+function getDisplayName(userId) {
+    return USER_NAMES[userId] || userId;
+}
 
 export default function Clasificacion() {
     const [standings, setStandings] = useState([]);
@@ -40,7 +45,7 @@ export default function Clasificacion() {
                     {standings.map((entry, index) => (
                         <tr key={entry.userId}>
                             <td>{index + 1}</td>
-                            <td>{entry.userName}</td>
+                            <td>{getDisplayName(entry.userId)}</td>
                             <td>{entry.points}</td>
                             <td>{entry.correct}</td>
                         </tr>
