@@ -64,5 +64,12 @@ functions:
                   path: /standings
                   method: get
 
+    getMissingBets:
+        handler: src/handlers/admin.getMissingBets
+        events:
+            - httpApi:
+                  path: /admin/missing-bets
+                  method: get
+
 plugins:
     - serverless-offline

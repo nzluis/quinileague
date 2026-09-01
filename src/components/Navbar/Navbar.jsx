@@ -8,16 +8,23 @@ export default function Navbar() {
     const { user, logout } = useAuth();
     const location = useLocation();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [adminOpen, setAdminOpen] = useState(false);
 
     const isActive = (path) => location.pathname === path;
     const isAdmin = ADMIN_USERS.includes(user?.username);
 
     if (!user) return null;
 
+    const closeMenu = () => setMenuOpen(false);
+    const closeAll = () => {
+        setMenuOpen(false);
+        setAdminOpen(false);
+    };
+
     return (
         <nav className={styles.navbar}>
             <div className={styles.brand}>
-                <Link to="/" onClick={() => setMenuOpen(false)}>
+                <Link to="/" onClick={closeAll}>
                     <span className={styles.logo}>⚽</span>
                     <span>quiniLEAGUE</span>
                 </Link>
@@ -36,7 +43,7 @@ export default function Navbar() {
                         <Link
                             to="/apuestas"
                             className={isActive('/apuestas') ? styles.active : ''}
-                            onClick={() => setMenuOpen(false)}
+                            onClick={closeMenu}
                         >
                             Apuestas
                         </Link>
@@ -45,7 +52,7 @@ export default function Navbar() {
                         <Link
                             to="/resultados"
                             className={isActive('/resultados') ? styles.active : ''}
-                            onClick={() => setMenuOpen(false)}
+                            onClick={closeMenu}
                         >
                             Resultados
                         </Link>
@@ -54,20 +61,40 @@ export default function Navbar() {
                         <Link
                             to="/clasificacion"
                             className={isActive('/clasificacion') ? styles.active : ''}
-                            onClick={() => setMenuOpen(false)}
+                            onClick={closeMenu}
                         >
                             Clasificación
                         </Link>
                     </li>
                     {isAdmin && (
-                        <li>
-                            <Link
-                                to="/admin"
-                                className={isActive('/admin') ? styles.active : ''}
-                                onClick={() => setMenuOpen(false)}
+                        <li className={styles.adminItem}>
+                            <button
+                                className={`${styles.adminBtn} ${isActive('/admin') || isActive('/admin/check') ? styles.active : ''}`}
+                                onClick={() => setAdminOpen((o) => !o)}
                             >
-                                Subir Resultados
-                            </Link>
+                                Admin
+                                <span className={styles.arrow}>{adminOpen ? '▲' : '▼'}</span>
+                            </button>
+                            <ul className={`${styles.adminDropdown} ${adminOpen ? styles.dropdownOpen : ''}`}>
+                                <li>
+                                    <Link
+                                        to="/admin"
+                                        className={isActive('/admin') && !isActive('/admin/check') ? styles.active : ''}
+                                        onClick={closeAll}
+                                    >
+                                        Subir Resultados
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        to="/admin/check"
+                                        className={isActive('/admin/check') ? styles.active : ''}
+                                        onClick={closeAll}
+                                    >
+                                        Check
+                                    </Link>
+                                </li>
+                            </ul>
                         </li>
                     )}
                 </ul>
@@ -77,7 +104,7 @@ export default function Navbar() {
             </div>
 
             {menuOpen && (
-                <div className={styles.overlay} onClick={() => setMenuOpen(false)} />
+                <div className={styles.overlay} onClick={closeMenu} />
             )}
         </nav>
     );
