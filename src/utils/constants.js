@@ -17,7 +17,7 @@ export const USER_NAMES = {
     '2199f05e-e0f1-7088-1790-632aea41b266': 'Cule',
     'a1c9405e-60f1-7076-1515-2ce82bce6227': 'Ortega',
     'e1e950ee-1011-70fe-a066-d28451dadaf0': 'Edu',
-    '7129f08e-50a1-70d1-ad27-862dcba45053': 'Duda'
+    '7129f08e-50a1-70d1-ad27-862dcba45053': 'Duda',
     'e1f9806e-60f1-70bb-9c77-c035e299c55c': 'Vic',
     '4159d01e-f001-705f-b0ce-0d83d6756592': 'Manu'
 };
