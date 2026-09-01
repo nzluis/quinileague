@@ -55,6 +55,10 @@ export default {
     },
 
     async getStandings() {
-        return request('/standings');
+        return request(`/standings`);
+    },
+
+    async getMissingBets() {
+        return request(`/admin/missing-bets`);
     },
 };

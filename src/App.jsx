@@ -8,6 +8,7 @@ import Apuestas from './pages/Apuestas';
 import Clasificacion from './pages/Clasificacion';
 import Resultados from './pages/Resultados';
 import Admin from './pages/Admin';
+import Check from './pages/Check';
 import Spinner from './components/Spinner/Spinner';
 import layoutStyles from './Layout.module.css';
 
@@ -59,6 +60,14 @@ function Shell() {
                         element={
                             <ProtectedRoute>
                                 <Admin />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/check"
+                        element={
+                            <ProtectedRoute>
+                                <Check />
                             </ProtectedRoute>
                         }
                     />

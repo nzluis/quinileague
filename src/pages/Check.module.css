@@ -1,0 +1,85 @@
+.container {
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.container h1 {
+    margin-bottom: 2rem;
+    color: var(--primary);
+}
+
+.checkBtn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.checkBtn:hover:not(:disabled) {
+    background: var(--primary-dark);
+}
+
+.checkBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.result {
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.noMatchdays {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.nearestDate {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+.matchdayCard {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.matchdayCard h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary);
+}
+
+.deadline {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.allBet {
+    color: var(--success, #22c55e);
+    font-weight: 500;
+}
+
+.userList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.userList li {
+    padding: 0.5rem;
+    background: #f3f4f6;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}

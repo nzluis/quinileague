@@ -100,6 +100,69 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+.adminItem {
+    position: relative;
+}
+
+.adminBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.adminBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.arrow {
+    font-size: 0.7rem;
+}
+
+.adminDropdown {
+    display: none;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dropdownOpen {
+    display: flex;
+}
+
+.adminDropdown li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.adminDropdown li:last-child {
+    border-bottom: none;
+}
+
+.adminDropdown a {
+    display: block;
+    padding: 1rem 1.5rem 1rem 2.5rem;
+    color: white;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+
+.adminDropdown a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.adminDropdown .active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 .overlay {
     display: none;
 }
@@ -157,6 +220,51 @@
 
     .navLinksOpen a:hover {
         background: rgba(255, 255, 255, 0.15);
+    }
+
+    .adminItem {
+        position: relative;
+    }
+
+    .adminBtn {
+        padding: 0.5rem 0.9rem;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        width: auto;
+    }
+
+    .adminBtn:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .adminBtn.active {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .adminDropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 180px;
+        background: var(--primary);
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .adminDropdown a {
+        padding: 0.75rem 1rem 0.75rem 1.25rem;
+    }
+
+    .adminDropdown li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .adminDropdown li:last-child {
+        border-bottom: none;
+    }
+
+    .adminDropdown a:hover {
+        background: rgba(255, 255, 255, 0.1);
     }
 
     .signOut {
