@@ -46,6 +46,10 @@
     word-break: break-word;
 }
 
+.table tbody tr:nth-child(even) td {
+    background: #f5f5f5;
+}
+
 .table tr:not(:last-child) td {
     border-bottom: 1px solid #eee;
 }
