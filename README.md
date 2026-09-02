@@ -68,7 +68,7 @@ Deployed manually with AWS CLI (2026-08-18):
 | Cognito App Client | 5cjeur7sgn2rnstlr9rhoocigp |
 | API Gateway | QuinileaGUE-API (ykybklpdhd) |
 | IAM Role | QuinileaGUE-LambdaRole |
-| Lambda Functions | quinileague-getMatches, quinileague-getNextMatchday, quinileague-getBets, quinileague-createBet, quinileague-createResults, quinileague-getResults, quinileague-getStandings |
+| Lambda Functions | quinileague-getMatches, quinileague-getNextMatchday, quinileague-getBets, quinileague-createBet, quinileague-createResults, quinileague-getResults, quinileague-getStandings, quinileague-getMissingBets |
 
 **API Endpoint:** `https://ykybklpdhd.execute-api.eu-west-3.amazonaws.com`
 
@@ -114,6 +114,7 @@ Go to **Actions** tab → **Deploy to AWS Lambda** → **Run workflow**
 | POST | /results | Submit match results (admin) |
 | GET | /results | Get all results |
 | GET | /standings | Get user standings |
+| GET | /admin/missing-bets | Get users who haven't bet on the nearest matchday (admin) |
 
 ## Features
 
