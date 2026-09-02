@@ -40,7 +40,7 @@ jobs:
 
       - name: Update Lambda functions
         run: |
-          for func in getMatches getNextMatchday getBets createBet getResults createResults getStandings; do
+          for func in getMatches getNextMatchday getBets createBet getResults createResults getStandings getMissingBets; do
             echo "Updating quinileague-$func..."
             aws lambda update-function-code \
               --function-name quinileague-$func \
