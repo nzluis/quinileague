@@ -114,7 +114,7 @@ Go to **Actions** tab → **Deploy to AWS Lambda** → **Run workflow**
 | POST | /results | Submit match results (admin) |
 | GET | /results | Get all results |
 | GET | /standings | Get user standings |
-| GET | /admin/missing-bets | Get users who haven't bet on the nearest matchday (admin) |
+| GET | /admin/missing-bets | Get users who haven't bet on matchdays with deadline in the next 10 days (admin) |
 
 ## Features
 
