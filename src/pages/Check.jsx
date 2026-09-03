@@ -53,13 +53,7 @@ export default function Check() {
                     ) : (
                         <>
                             <p className={styles.nearestDate}>
-                                Deadline más próximo:{' '}
-                                {new Date(result.nearestDate).toLocaleDateString('es-ES', {
-                                    weekday: 'long',
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                })}
+                                {result.deadlineDates.length} deadline{result.deadlineDates.length > 1 ? 's' : ''} próximo{result.deadlineDates.length > 1 ? 's' : ''} (próximos 10 días)
                             </p>
 
                             {result.matchdays.map((md) => (
