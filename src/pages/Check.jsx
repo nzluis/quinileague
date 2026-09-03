@@ -46,17 +46,21 @@ export default function Check() {
 
             {result && (
                 <div className={styles.result}>
-                    {result.matchdays.length === 0 ? (
+                    {(() => {
+                        const matchdays = result.matchdays ?? [];
+                        const deadlineDates = result.deadlineDates
+                            ?? (result.nearestDate ? [result.nearestDate] : []);
+                        return matchdays.length === 0 ? (
                         <p className={styles.noMatchdays}>
                             No hay jornadas con deadline próximo
                         </p>
                     ) : (
                         <>
                             <p className={styles.nearestDate}>
-                                {result.deadlineDates.length} deadline{result.deadlineDates.length > 1 ? 's' : ''} próximo{result.deadlineDates.length > 1 ? 's' : ''} (próximos 10 días)
+                                {deadlineDates.length} deadline{deadlineDates.length > 1 ? 's' : ''} próximo{deadlineDates.length > 1 ? 's' : ''} (próximos 10 días)
                             </p>
 
-                            {result.matchdays.map((md) => (
+                            {matchdays.map((md) => (
                                 <div key={md.matchday} className={styles.matchdayCard}>
                                     <h2>Jornada {md.matchday}</h2>
                                     <p className={styles.deadline}>
@@ -83,7 +87,8 @@ export default function Check() {
                                 </div>
                             ))}
                         </>
-                    )}
+                    );
+                    })()}
                 </div>
             )}
         </div>
