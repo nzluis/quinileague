@@ -31,15 +31,19 @@ exports.getMissingBets = async () => {
         await dbConnect();
 
         const now = new Date();
+        const tenDaysFromNow = new Date(now);
+        tenDaysFromNow.setDate(tenDaysFromNow.getDate() + 10);
 
         const matches = await Match.find().sort({ date: 1 }).lean();
 
         const matchdaysWithDeadline = matches.reduce((acc, match) => {
             const deadline = new Date(match.date);
             deadline.setMinutes(deadline.getMinutes() - 5);
-            const deadlineDate = new Date(deadline.toISOString().split('T')[0]);
 
-            if (deadlineDate <= now) return acc;
+            if (deadline <= now) return acc;
+            if (deadline > tenDaysFromNow) return acc;
+
+            const deadlineDate = new Date(deadline.toISOString().split('T')[0]);
 
             if (!acc[deadlineDate.toISOString()]) {
                 acc[deadlineDate.toISOString()] = [];
@@ -66,29 +70,29 @@ exports.getMissingBets = async () => {
             };
         }
 
-        const nearestDate = deadlineDates[0];
-        const relevantMatchdays = matchdaysWithDeadline[nearestDate];
-
         const result = [];
 
-        for (const md of relevantMatchdays) {
-            const existingBets = await Bet.find({ matchday: md.matchday }).lean();
-            const usersWhoBet = new Set(existingBets.map(b => b.userId));
-            const missingUsers = USER_IDS.filter(uid => !usersWhoBet.has(uid));
+        for (const deadlineDate of deadlineDates) {
+            const matchdaysForDate = matchdaysWithDeadline[deadlineDate];
+            for (const md of matchdaysForDate) {
+                const existingBets = await Bet.find({ matchday: md.matchday }).lean();
+                const usersWhoBet = new Set(existingBets.map(b => b.userId));
+                const missingUsers = USER_IDS.filter(uid => !usersWhoBet.has(uid));
 
-            result.push({
-                matchday: md.matchday,
-                deadline: md.deadline,
-                firstMatchDate: md.firstMatchDate,
-                missingUsers,
-            });
+                result.push({
+                    matchday: md.matchday,
+                    deadline: md.deadline,
+                    firstMatchDate: md.firstMatchDate,
+                    missingUsers,
+                });
+            }
         }
 
         return {
             statusCode: 200,
             headers: HEADERS,
             body: JSON.stringify({
-                nearestDate,
+                deadlineDates,
                 matchdays: result,
             }),
         };
