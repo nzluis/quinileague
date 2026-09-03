@@ -36,57 +36,52 @@ exports.getMissingBets = async () => {
 
         const matches = await Match.find().sort({ date: 1 }).lean();
 
-        const matchdaysWithDeadline = matches.reduce((acc, match) => {
+        const matchdayMap = matches.reduce((acc, match) => {
+            if (acc[match.matchday]) return acc;
+
             const deadline = new Date(match.date);
             deadline.setMinutes(deadline.getMinutes() - 5);
 
             if (deadline <= now) return acc;
             if (deadline > tenDaysFromNow) return acc;
 
-            const deadlineDate = new Date(deadline.toISOString().split('T')[0]);
-
-            if (!acc[deadlineDate.toISOString()]) {
-                acc[deadlineDate.toISOString()] = [];
-            }
-
-            const existing = acc[deadlineDate.toISOString()].find(m => m.matchday === match.matchday);
-            if (!existing) {
-                acc[deadlineDate.toISOString()].push({
-                    matchday: match.matchday,
-                    deadline: deadline.toISOString(),
-                    firstMatchDate: match.date,
-                });
-            }
+            acc[match.matchday] = {
+                matchday: match.matchday,
+                deadline: deadline.toISOString(),
+                firstMatchDate: match.date,
+            };
 
             return acc;
         }, {});
 
-        const deadlineDates = Object.keys(matchdaysWithDeadline).sort();
-        if (deadlineDates.length === 0) {
+        const matchdays = Object.values(matchdayMap).sort((a, b) =>
+            new Date(a.deadline) - new Date(b.deadline)
+        );
+
+        if (matchdays.length === 0) {
             return {
                 statusCode: 200,
                 headers: HEADERS,
-                body: JSON.stringify({ matchdays: [], nearestDate: null }),
+                body: JSON.stringify({ matchdays: [], deadlineDates: [] }),
             };
         }
 
         const result = [];
 
-        for (const deadlineDate of deadlineDates) {
-            const matchdaysForDate = matchdaysWithDeadline[deadlineDate];
-            for (const md of matchdaysForDate) {
-                const existingBets = await Bet.find({ matchday: md.matchday }).lean();
-                const usersWhoBet = new Set(existingBets.map(b => b.userId));
-                const missingUsers = USER_IDS.filter(uid => !usersWhoBet.has(uid));
+        for (const md of matchdays) {
+            const existingBets = await Bet.find({ matchday: md.matchday }).lean();
+            const usersWhoBet = new Set(existingBets.map(b => b.userId));
+            const missingUsers = USER_IDS.filter(uid => !usersWhoBet.has(uid));
 
-                result.push({
-                    matchday: md.matchday,
-                    deadline: md.deadline,
-                    firstMatchDate: md.firstMatchDate,
-                    missingUsers,
-                });
-            }
+            result.push({
+                matchday: md.matchday,
+                deadline: md.deadline,
+                firstMatchDate: md.firstMatchDate,
+                missingUsers,
+            });
         }
+
+        const deadlineDates = matchdays.map(m => m.deadline);
 
         return {
             statusCode: 200,
