@@ -112,36 +112,36 @@
     color: var(--primary);
 }
 
-.matchResult {
+.resultRow {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     margin-top: 0.5rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 8px;
+}
+
+.score {
     font-weight: 700;
-    font-size: 0.95rem;
-}
-
-.matchResultCorrect {
-    background: rgba(34, 139, 34, 0.1);
-    color: #1a7a1a;
-    border: 1px solid rgba(34, 139, 34, 0.3);
-}
-
-.matchResultWrong {
-    background: rgba(200, 30, 30, 0.1);
-    color: #c81e1e;
-    border: 1px solid rgba(200, 30, 30, 0.3);
-}
-
-.matchResultLabel {
     font-size: 1.1rem;
+    color: var(--text);
 }
 
-.matchResultIcon {
-    font-size: 1rem;
+.resultBadge {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+}
+
+.resultBadgeCorrect {
+    background: rgba(34, 139, 34, 0.12);
+    color: #1a7a1a;
+}
+
+.resultBadgeWrong {
+    background: rgba(200, 30, 30, 0.12);
+    color: #c81e1e;
 }
 
 @media (min-width: 768px) {
@@ -195,12 +195,16 @@
         margin-top: 0.75rem;
     }
 
-    .matchResult {
+    .resultRow {
         margin-top: 0.75rem;
-        font-size: 1.05rem;
     }
 
-    .matchResultLabel {
-        font-size: 1.2rem;
+    .score {
+        font-size: 1.25rem;
+    }
+
+    .resultBadge {
+        font-size: 0.9rem;
+        padding: 0.2rem 0.6rem;
     }
 }
