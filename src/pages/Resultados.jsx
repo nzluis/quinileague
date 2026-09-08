@@ -18,9 +18,9 @@ export default function Resultados() {
 
     useEffect(() => {
         api.getResults().then((data) => {
-            const days = (data.results || []).map((r) => r.matchday).sort((a, b) => b - a);
+            const days = (data.results || []).map((r) => r.matchday).sort((a, b) => a - b);
             setAvailableMatchdays(days);
-            setSelectedMatchday(days[0] ?? null);
+            setSelectedMatchday(days[days.length - 1] ?? null);
         }).catch(() => {}).finally(() => setLoading(false));
     }, []);
 
