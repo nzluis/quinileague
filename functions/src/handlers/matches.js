@@ -18,10 +18,21 @@ exports.getMatches = async (event) => {
             .sort({ date: 1 })
             .lean();
 
+        const resultEntry = await Result.findOne({ matchday }).lean();
+        const games = resultEntry?.games
+            ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games)
+            : {};
+
+        const enriched = matches.map((m) => ({
+            ...m,
+            score: games[m.matchId]?.score || null,
+            result: games[m.matchId]?.result || null,
+        }));
+
         return {
             statusCode: 200,
             headers: HEADERS,
-            body: JSON.stringify({ matches }),
+            body: JSON.stringify({ matches: enriched }),
         };
     } catch (error) {
         console.error(error);
