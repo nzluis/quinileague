@@ -58,18 +58,14 @@ export default function MatchCard({ match, prediction, onPredictionChange, disab
                 </div>
             )}
 
-            {match.result && readOnly && (
-                <div className={`${styles.matchResult} ${prediction === match.result ? styles.matchResultCorrect : styles.matchResultWrong}`}>
-                    <span className={styles.matchResultLabel}>{match.result}</span>
-                    {prediction && (
-                        <span className={styles.matchResultIcon}>{prediction === match.result ? '✓' : '✗'}</span>
+            {match.score !== null && readOnly && (
+                <div className={styles.resultRow}>
+                    <span className={styles.score}>{match.score}</span>
+                    {match.result && (
+                        <span className={`${styles.resultBadge} ${prediction === match.result ? styles.resultBadgeCorrect : styles.resultBadgeWrong}`}>
+                            {match.result}
+                        </span>
                     )}
-                </div>
-            )}
-
-            {match.score !== null && (
-                <div className={styles.result}>
-                    {match.score}
                 </div>
             )}
         </div>
