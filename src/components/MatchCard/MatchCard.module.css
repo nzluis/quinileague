@@ -112,6 +112,38 @@
     color: var(--primary);
 }
 
+.matchResult {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.matchResultCorrect {
+    background: rgba(34, 139, 34, 0.1);
+    color: #1a7a1a;
+    border: 1px solid rgba(34, 139, 34, 0.3);
+}
+
+.matchResultWrong {
+    background: rgba(200, 30, 30, 0.1);
+    color: #c81e1e;
+    border: 1px solid rgba(200, 30, 30, 0.3);
+}
+
+.matchResultLabel {
+    font-size: 1.1rem;
+}
+
+.matchResultIcon {
+    font-size: 1rem;
+}
+
 @media (min-width: 768px) {
     .card {
         padding: 1.25rem;
@@ -161,5 +193,14 @@
     .result {
         font-size: 1.25rem;
         margin-top: 0.75rem;
+    }
+
+    .matchResult {
+        margin-top: 0.75rem;
+        font-size: 1.05rem;
+    }
+
+    .matchResultLabel {
+        font-size: 1.2rem;
     }
 }

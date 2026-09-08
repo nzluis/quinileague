@@ -58,9 +58,18 @@ export default function MatchCard({ match, prediction, onPredictionChange, disab
                 </div>
             )}
 
-            {match.homeScore !== null && (
+            {match.result && readOnly && (
+                <div className={`${styles.matchResult} ${prediction === match.result ? styles.matchResultCorrect : styles.matchResultWrong}`}>
+                    <span className={styles.matchResultLabel}>{match.result}</span>
+                    {prediction && (
+                        <span className={styles.matchResultIcon}>{prediction === match.result ? '✓' : '✗'}</span>
+                    )}
+                </div>
+            )}
+
+            {match.score !== null && (
                 <div className={styles.result}>
-                    {match.homeScore} - {match.awayScore}
+                    {match.score}
                 </div>
             )}
         </div>
