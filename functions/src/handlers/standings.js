@@ -41,9 +41,12 @@ exports.getStandings = async (event) => {
         const allBets = await Bet.find({}).lean();
 
         const pointsByUser = {};
+        const pointsByUserComplete = {};
 
         for (const matchday of matchdays) {
             const dayBets = allBets.filter((b) => b.matchday === matchday);
+            const totalGames = gamesCountByMatchday[matchday];
+            const isComplete = totalGames >= 10;
 
             const userPoints = {};
             for (const bet of dayBets) {
@@ -58,8 +61,6 @@ exports.getStandings = async (event) => {
                 }
             }
 
-            const totalGames = gamesCountByMatchday[matchday];
-            const isComplete = totalGames >= 10;
             for (const user of Object.values(userPoints)) {
                 if (isComplete && user.correct === 10) {
                     user.points = 40;
@@ -72,21 +73,28 @@ exports.getStandings = async (event) => {
                 }
                 pointsByUser[userId].points += data.points;
                 pointsByUser[userId].correct += data.correct;
+
+                if (isComplete) {
+                    if (!pointsByUserComplete[userId]) {
+                        pointsByUserComplete[userId] = { points: 0, correct: 0 };
+                    }
+                    pointsByUserComplete[userId].points += data.points;
+                    pointsByUserComplete[userId].correct += data.correct;
+                }
             }
         }
 
-        const standings = Object.entries(pointsByUser)
-            .map(([userId, data]) => ({
-                userId,
-                points: data.points,
-                correct: data.correct,
-            }))
+        const sortStandings = (map) => Object.entries(map)
+            .map(([userId, data]) => ({ userId, points: data.points, correct: data.correct }))
             .sort((a, b) => b.points - a.points);
+
+        const standings = sortStandings(pointsByUser);
+        const standingsComplete = sortStandings(pointsByUserComplete);
 
         return {
             statusCode: 200,
             headers: HEADERS,
-            body: JSON.stringify({ standings, provisionalMatchdays }),
+            body: JSON.stringify({ standings, standingsComplete, provisionalMatchdays }),
         };
     } catch (error) {
         console.error(error);
