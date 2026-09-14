@@ -60,7 +60,7 @@ export default function Resultados() {
                         <h2 className={styles.sectionTitle}>Jornada {selectedMatchday}</h2>
                         {!matchdayData.isComplete && (
                             <div className={styles.warningBanner}>
-                                Jornada parcial: {matchdayData.confirmedCount} de {matchdayData.totalMatches} partidos confirmados. Los puntos son provisionales.
+                                Provisional - Jornada {selectedMatchday} - {matchdayData.confirmedCount}/{matchdayData.totalMatches}
                             </div>
                         )}
                         <div className={styles.summaryTable}>

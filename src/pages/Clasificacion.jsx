@@ -36,7 +36,7 @@ export default function Clasificacion() {
             <h1>Clasificación</h1>
             {provisionalMatchdays.length > 0 && (
                 <div className={styles.warningBanner}>
-                    Clasificación provisional. Faltan resultados por confirmar en las jornadas: {provisionalMatchdays.sort((a, b) => a - b).join(', ')}
+                    Provisional - {provisionalMatchdays.length} {provisionalMatchdays.length === 1 ? 'Jornada' : 'Jornadas'} en juego
                 </div>
             )}
             <table className={styles.table}>
