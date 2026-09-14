@@ -24,18 +24,25 @@ export default function Admin() {
     }
 
     useEffect(() => {
-        api.getMatchdayStatuses().then((data) => {
-            const passed = (data.matchdays || []).filter((md) => md.passed);
-            setAvailableMatchdays(passed);
+        Promise.all([api.getResults(), api.getNextMatchday()]).then(([resultsData, nextData]) => {
+            const matchdaysFromResults = (resultsData.results || []).map((r) => ({
+                matchday: r.matchday,
+                complete: r.complete,
+                confirmedCount: r.confirmedCount,
+            }));
 
-            const firstIncomplete = passed.find((md) => !md.complete);
-            setSelectedMatchday(firstIncomplete?.matchday ?? passed[0]?.matchday ?? null);
+            const nextMd = nextData.matchday;
+            if (nextMd && !matchdaysFromResults.find((m) => m.matchday === nextMd)) {
+                matchdaysFromResults.push({ matchday: nextMd, complete: false, confirmedCount: 0 });
+            }
+
+            matchdaysFromResults.sort((a, b) => a.matchday - b.matchday);
+            setAvailableMatchdays(matchdaysFromResults);
+
+            const firstIncomplete = matchdaysFromResults.find((md) => !md.complete);
+            setSelectedMatchday(firstIncomplete?.matchday ?? matchdaysFromResults[0]?.matchday ?? 1);
         }).catch(() => {
-            api.getNextMatchday().then((res) => {
-                setSelectedMatchday(res.matchday || 1);
-            }).catch(() => {
-                setSelectedMatchday(1);
-            });
+            setSelectedMatchday(1);
         });
     }, []);
 
