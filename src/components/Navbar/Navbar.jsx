@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ADMIN_USERS } from '../../utils/constants';
+import { ADMIN_USERS, FULL_ADMIN_USERS } from '../../utils/constants';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -12,6 +12,7 @@ export default function Navbar() {
 
     const isActive = (path) => location.pathname === path;
     const isAdmin = ADMIN_USERS.includes(user?.username);
+    const isFullAdmin = FULL_ADMIN_USERS.includes(user?.username);
 
     if (!user) return null;
 
@@ -85,15 +86,17 @@ export default function Navbar() {
                                         Subir Resultados
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link
-                                        to="/admin/check"
-                                        className={isActive('/admin/check') ? styles.active : ''}
-                                        onClick={closeAll}
-                                    >
-                                        Check
-                                    </Link>
-                                </li>
+                                {isFullAdmin && (
+                                    <li>
+                                        <Link
+                                            to="/admin/check"
+                                            className={isActive('/admin/check') ? styles.active : ''}
+                                            onClick={closeAll}
+                                        >
+                                            Check
+                                        </Link>
+                                    </li>
+                                )}
                             </ul>
                         </li>
                     )}

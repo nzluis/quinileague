@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { showError } from '../utils/toast';
-import { ADMIN_USERS, USER_NAMES } from '../utils/constants';
+import { ADMIN_USERS, FULL_ADMIN_USERS, USER_NAMES } from '../utils/constants';
 import api from '../utils/api';
 import styles from './Check.module.css';
 
@@ -10,7 +10,7 @@ export default function Check() {
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState(null);
 
-    if (!ADMIN_USERS.includes(user.username)) {
+    if (!FULL_ADMIN_USERS.includes(user.username)) {
         return (
             <div className={styles.container}>
                 <p>No tienes permisos de administrador</p>
