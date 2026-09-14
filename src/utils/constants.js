@@ -28,4 +28,6 @@ export const PREDICTION_LABELS = {
     '2': 'Victoria visitante',
 };
 
-export const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];
+export const ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336', '4119702e-8051-7068-974e-78000970175f'];
+
+export const FULL_ADMIN_USERS = ['aguakiko@gmail.com', '61d900fe-30e1-70c5-2e71-bcd4b4eb8336'];
