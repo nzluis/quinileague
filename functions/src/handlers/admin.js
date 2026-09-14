@@ -1,6 +1,8 @@
 const dbConnect = require('../services/db');
 const Match = require('../services/matchModel');
 const Bet = require('../services/betModel');
+const Result = require('../services/resultModel');
+const { getMatchdayStatus } = require('../services/matchdayStatus');
 
 const HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -97,6 +99,61 @@ exports.getMissingBets = async () => {
             statusCode: 500,
             headers: HEADERS,
             body: JSON.stringify({ error: 'Error checking missing bets' }),
+        };
+    }
+};
+
+exports.getMatchdayStatuses = async () => {
+    try {
+        await dbConnect();
+
+        const now = new Date();
+
+        const allMatches = await Match.find().sort({ date: 1 }).lean();
+        const firstMatchByMatchday = {};
+        for (const m of allMatches) {
+            if (!firstMatchByMatchday[m.matchday]) {
+                firstMatchByMatchday[m.matchday] = m;
+            }
+        }
+
+        const allResults = await Result.find().lean();
+        const resultByMatchday = {};
+        for (const r of allResults) {
+            const games = r.games instanceof Map ? Object.fromEntries(r.games) : r.games;
+            resultByMatchday[r.matchday] = getMatchdayStatus(games);
+        }
+
+        const matchdays = [];
+        for (let md = 1; md <= 38; md++) {
+            const firstMatch = firstMatchByMatchday[md];
+            if (!firstMatch) continue;
+
+            const deadline = new Date(firstMatch.date);
+            deadline.setMinutes(deadline.getMinutes() - 5);
+
+            const status = resultByMatchday[md] || { complete: false, confirmedCount: 0, totalMatches: 10 };
+
+            matchdays.push({
+                matchday: md,
+                deadline: deadline.toISOString(),
+                passed: deadline <= now,
+                complete: status.complete,
+                confirmedCount: status.confirmedCount,
+            });
+        }
+
+        return {
+            statusCode: 200,
+            headers: HEADERS,
+            body: JSON.stringify({ matchdays }),
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 500,
+            headers: HEADERS,
+            body: JSON.stringify({ error: 'Error fetching matchday statuses' }),
         };
     }
 };

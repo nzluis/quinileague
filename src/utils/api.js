@@ -61,4 +61,8 @@ export default {
     async getMissingBets() {
         return request(`/admin/missing-bets`);
     },
+
+    async getMatchdayStatuses() {
+        return request(`/admin/matchday-statuses`);
+    },
 };

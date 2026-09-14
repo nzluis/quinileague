@@ -71,5 +71,12 @@ functions:
                   path: /admin/missing-bets
                   method: get
 
+    getMatchdayStatuses:
+        handler: src/handlers/admin.getMatchdayStatuses
+        events:
+            - httpApi:
+                  path: /admin/matchday-statuses
+                  method: get
+
 plugins:
     - serverless-offline
