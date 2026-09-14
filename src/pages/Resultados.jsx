@@ -59,7 +59,7 @@ export default function Resultados() {
                 <>
                     <div className={styles.summarySection}>
                         <h2 className={styles.sectionTitle}>Jornada {selectedMatchday}</h2>
-                        {!matchdayData.isComplete && (
+                        {matchdayData.complete === false && (
                             <div className={styles.warningBanner}>
                                 Provisional - {matchdayData.confirmedCount}/{matchdayData.totalMatches}
                             </div>
