@@ -10,6 +10,7 @@ function getDisplayName(userId) {
 
 export default function Clasificacion() {
     const [standings, setStandings] = useState([]);
+    const [provisionalMatchdays, setProvisionalMatchdays] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -20,6 +21,7 @@ export default function Clasificacion() {
         try {
             const data = await api.getStandings();
             setStandings(data.standings || []);
+            setProvisionalMatchdays(data.provisionalMatchdays || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -32,6 +34,11 @@ export default function Clasificacion() {
     return (
         <div className={styles.container}>
             <h1>Clasificación</h1>
+            {provisionalMatchdays.length > 0 && (
+                <div className={styles.warningBanner}>
+                    Clasificación provisional. Faltan resultados por confirmar en las jornadas: {provisionalMatchdays.sort((a, b) => a - b).join(', ')}
+                </div>
+            )}
             <table className={styles.table}>
                 <thead>
                     <tr>

@@ -2,6 +2,7 @@ const dbConnect = require('../services/db');
 const Match = require('../services/matchModel');
 const Bet = require('../services/betModel');
 const Result = require('../services/resultModel');
+const { getMatchdayStatus } = require('../services/matchdayStatus');
 
 const HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -54,45 +55,49 @@ exports.getResults = async (event) => {
             if (games && Object.keys(games).length > 0) {
                 const matchIds = Object.keys(games);
                 const matches = await Match.find({ matchId: { $in: matchIds } }).lean();
-                resultsByMatchday[r.matchday] = matches;
+                resultsByMatchday[r.matchday] = { matches, games };
             }
         }
 
-        const results = Object.entries(resultsByMatchday).map(([md, ms]) => ({
+        const results = Object.entries(resultsByMatchday).map(([md, data]) => ({
             matchday: parseInt(md),
-            matches: ms,
+            matches: data.matches,
+            ...getMatchdayStatus(data.games),
         }));
 
         if (matchday !== null) {
-            const dayMatches = resultsByMatchday[matchday];
-            if (!dayMatches || dayMatches.length === 0) {
+            const dayData = resultsByMatchday[matchday];
+            if (!dayData || dayData.matches.length === 0) {
                 const resultEntry = await Result.findOne({ matchday }).lean();
-                const games = resultEntry?.games 
-                    ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games) 
+                const games = resultEntry?.games
+                    ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games)
                     : {};
                 return {
                     statusCode: 200,
                     headers: HEADERS,
-                    body: JSON.stringify({ matchday, matches: [], users: [], summary: {}, games }),
+                    body: JSON.stringify({ matchday, matches: [], users: [], summary: {}, games, ...getMatchdayStatus(games) }),
                 };
             }
 
             const bets = await Bet.find({ matchday }).lean();
-            const resultEntry = await Result.findOne({ matchday }).lean();
-            const games = resultEntry?.games 
-                ? (resultEntry.games instanceof Map ? Object.fromEntries(resultEntry.games) : resultEntry.games) 
-                : {};
-            const { users, summary } = calculateMatchdayPoints(bets, games);
+            const { users, summary } = calculateMatchdayPoints(bets, dayData.games);
 
-            const matchesWithResult = dayMatches.map((m) => {
-                const game = games[m.matchId];
+            const matchesWithResult = dayData.matches.map((m) => {
+                const game = dayData.games[m.matchId];
                 return { ...m, score: game?.score || null, result: game?.result || null };
             });
 
             return {
                 statusCode: 200,
                 headers: HEADERS,
-                body: JSON.stringify({ matchday, matches: matchesWithResult, users, summary, games }),
+                body: JSON.stringify({
+                    matchday,
+                    matches: matchesWithResult,
+                    users,
+                    summary,
+                    games: dayData.games,
+                    ...getMatchdayStatus(dayData.games),
+                }),
             };
         }
 
@@ -125,7 +130,11 @@ exports.createResults = async (event) => {
             };
         }
 
-        const games = new Map();
+        let resultDoc = await Result.findOne({ matchday });
+        if (!resultDoc) {
+            resultDoc = new Result({ matchday, games: new Map() });
+        }
+
         for (const r of results) {
             const home = parseInt(r.homeScore);
             const away = parseInt(r.awayScore);
@@ -133,14 +142,13 @@ exports.createResults = async (event) => {
             if (home > away) result = '1';
             else if (home < away) result = '2';
             else result = 'X';
-            games.set(r.matchId, {
+            resultDoc.games.set(r.matchId, {
                 score: `${home}-${away}`,
                 result,
             });
         }
 
-        await Result.deleteMany({ matchday });
-        await Result.create({ matchday, games });
+        await resultDoc.save();
 
         return {
             statusCode: 200,

@@ -135,3 +135,13 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.partialInfo {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.matchConfirmed {
+    border: 2px solid var(--success);
+    background: rgba(67, 160, 71, 0.04);
+}
