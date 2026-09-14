@@ -30,7 +30,13 @@ export default function Admin() {
 
             const firstIncomplete = passed.find((md) => !md.complete);
             setSelectedMatchday(firstIncomplete?.matchday ?? passed[0]?.matchday ?? null);
-        }).catch(() => {});
+        }).catch(() => {
+            api.getNextMatchday().then((res) => {
+                setSelectedMatchday(res.matchday || 1);
+            }).catch(() => {
+                setSelectedMatchday(1);
+            });
+        });
     }, []);
 
     useEffect(() => {
@@ -118,17 +124,19 @@ export default function Admin() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.indexBar}>
-                {availableMatchdays.map((md) => (
-                    <button
-                        key={md.matchday}
-                        className={`${styles.indexBtn} ${md.matchday === selectedMatchday ? styles.indexBtnActive : ''} ${md.complete ? styles.indexBtnComplete : ''}`}
-                        onClick={() => setSelectedMatchday(md.matchday)}
-                    >
-                        {md.matchday}
-                    </button>
-                ))}
-            </div>
+            {availableMatchdays.length > 0 && (
+                <div className={styles.indexBar}>
+                    {availableMatchdays.map((md) => (
+                        <button
+                            key={md.matchday}
+                            className={`${styles.indexBtn} ${md.matchday === selectedMatchday ? styles.indexBtnActive : ''} ${md.complete ? styles.indexBtnComplete : ''}`}
+                            onClick={() => setSelectedMatchday(md.matchday)}
+                        >
+                            {md.matchday}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {loading ? (
                 <p className={styles.info}>Cargando partidos...</p>
