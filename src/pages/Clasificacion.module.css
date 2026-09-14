@@ -1,5 +1,5 @@
 .container {
-    padding: 1rem 0;
+    padding: 0.4rem 0;
     overflow-x: auto;
 }
 
@@ -7,7 +7,7 @@
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .tab {
