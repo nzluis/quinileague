@@ -10,7 +10,9 @@ function getDisplayName(userId) {
 
 export default function Clasificacion() {
     const [standings, setStandings] = useState([]);
+    const [standingsComplete, setStandingsComplete] = useState([]);
     const [provisionalMatchdays, setProvisionalMatchdays] = useState([]);
+    const [viewMode, setViewMode] = useState('complete');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -21,6 +23,7 @@ export default function Clasificacion() {
         try {
             const data = await api.getStandings();
             setStandings(data.standings || []);
+            setStandingsComplete(data.standingsComplete || []);
             setProvisionalMatchdays(data.provisionalMatchdays || []);
         } catch (error) {
             console.error(error);
@@ -31,14 +34,27 @@ export default function Clasificacion() {
 
     if (loading) return <Spinner />;
 
+    const hasProvisional = provisionalMatchdays.length > 0;
+    const currentStandings = viewMode === 'provisional' ? standings : standingsComplete;
+
     return (
         <div className={styles.container}>
-            <h1>Clasificación</h1>
-            {provisionalMatchdays.length > 0 && (
-                <div className={styles.warningBanner}>
-                    Provisional - {provisionalMatchdays.length} {provisionalMatchdays.length === 1 ? 'Jornada' : 'Jornadas'} en juego
-                </div>
-            )}
+            <div className={styles.tabsRow}>
+                <button
+                    className={`${styles.tab} ${styles.tabGreen} ${(!hasProvisional || viewMode === 'complete') ? styles.tabActive : ''}`}
+                    onClick={() => setViewMode('complete')}
+                >
+                    Clasificación
+                </button>
+                {hasProvisional && (
+                    <button
+                        className={`${styles.tab} ${styles.tabYellow} ${viewMode === 'provisional' ? styles.tabActive : ''}`}
+                        onClick={() => setViewMode('provisional')}
+                    >
+                        ⏳ En juego
+                    </button>
+                )}
+            </div>
             <table className={styles.table}>
                 <thead>
                     <tr>
@@ -49,7 +65,7 @@ export default function Clasificacion() {
                     </tr>
                 </thead>
                 <tbody>
-                    {standings.map((entry, index) => (
+                    {currentStandings.map((entry, index) => (
                         <tr key={entry.userId}>
                             <td>{index + 1}</td>
                             <td>{getDisplayName(entry.userId)}</td>
