@@ -7,7 +7,9 @@ import styles from './Admin.module.css';
 
 export default function Admin() {
     const { user } = useAuth();
-    const [matchday, setMatchday] = useState(undefined);
+    const [availableMatchdays, setAvailableMatchdays] = useState([]);
+    const [selectedMatchday, setSelectedMatchday] = useState(undefined);
+    const [isComplete, setIsComplete] = useState(false);
     const [matches, setMatches] = useState([]);
     const [results, setResults] = useState({});
     const [loading, setLoading] = useState(false);
@@ -22,25 +24,31 @@ export default function Admin() {
     }
 
     useEffect(() => {
-        if (matchday !== undefined) {
-            fetchMatchday(matchday);
-        } else {
-            api.getNextMatchday().then((res) => {
-                setMatchday(res.matchday || 1);
-            }).catch(() => {
-                setMatchday(1);
-            });
+        api.getMatchdayStatuses().then((data) => {
+            const passed = (data.matchdays || []).filter((md) => md.passed);
+            setAvailableMatchdays(passed);
+
+            const firstIncomplete = passed.find((md) => !md.complete);
+            setSelectedMatchday(firstIncomplete?.matchday ?? passed[0]?.matchday ?? null);
+        }).catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (selectedMatchday !== undefined && selectedMatchday !== null) {
+            fetchMatchday(selectedMatchday);
         }
-    }, [matchday]);
+    }, [selectedMatchday]);
 
     const fetchMatchday = async (md) => {
         setLoading(true);
+        setIsComplete(false);
         try {
             const [matchesRes, resultsRes] = await Promise.all([
                 api.getMatches(md),
                 api.getResults(md),
             ]);
             setMatches(matchesRes.matches || []);
+            setIsComplete(resultsRes.complete || false);
 
             const existingResults = {};
             for (const match of matchesRes.matches || []) {
@@ -61,6 +69,7 @@ export default function Admin() {
     };
 
     const handleScoreChange = (matchId, field, value) => {
+        if (isComplete) return;
         const num = value === '' ? null : parseInt(value);
         setResults((prev) => ({
             ...prev,
@@ -69,6 +78,8 @@ export default function Admin() {
     };
 
     const handleSubmit = async () => {
+        if (isComplete) return;
+
         const matchesWithResults = matches.filter((m) => {
             const r = results[m.matchId];
             return r && r.home !== null && r.away !== null;
@@ -89,7 +100,7 @@ export default function Admin() {
                     awayScore: r.away,
                 };
             });
-            await api.submitResults(matchday, formattedResults);
+            await api.submitResults(selectedMatchday, formattedResults);
             showSuccess(`${formattedResults.length} resultado(s) guardado(s)`);
         } catch (error) {
             showError(error.message || 'Error guardando resultados');
@@ -107,25 +118,71 @@ export default function Admin() {
 
     return (
         <div className={styles.container}>
-            <h1>Admin - Introducir Resultados</h1>
-
-            <div className={styles.matchdaySelector}>
-                <label>Jornada: </label>
-                <input
-                    type="number"
-                    min="1"
-                    max="38"
-                    value={matchday}
-                    onChange={(e) => setMatchday(parseInt(e.target.value))}
-                />
+            <div className={styles.indexBar}>
+                {availableMatchdays.map((md) => (
+                    <button
+                        key={md.matchday}
+                        className={`${styles.indexBtn} ${md.matchday === selectedMatchday ? styles.indexBtnActive : ''} ${md.complete ? styles.indexBtnComplete : ''}`}
+                        onClick={() => setSelectedMatchday(md.matchday)}
+                    >
+                        {md.matchday}
+                    </button>
+                ))}
             </div>
 
             {loading ? (
-                <p>Cargando partidos...</p>
+                <p className={styles.info}>Cargando partidos...</p>
+            ) : isComplete ? (
+                <>
+                    <p className={styles.info}>
+                        Jornada {selectedMatchday} - Todos los resultados confirmados
+                    </p>
+
+                    <div className={styles.matches}>
+                        {matches.map((match) => {
+                            const r = results[match.matchId];
+                            return (
+                                <div key={match.matchId} className={`${styles.matchCard} ${styles.matchLocked}`}>
+                                    <div className={styles.matchDate}>
+                                        {new Date(match.date).toLocaleDateString('es-ES', {
+                                            weekday: 'short',
+                                            day: 'numeric',
+                                            month: 'short',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </div>
+                                    <div className={styles.matchTeams}>
+                                        <span className={styles.team}>{match.homeTeam}</span>
+                                        <span className={styles.versus}>vs</span>
+                                        <span className={styles.team}>{match.awayTeam}</span>
+                                    </div>
+                                    <div className={styles.scoreInputs}>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className={styles.scoreInput}
+                                            value={r?.home ?? ''}
+                                            readOnly
+                                        />
+                                        <span className={styles.scoreSeparator}>-</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className={styles.scoreInput}
+                                            value={r?.away ?? ''}
+                                            readOnly
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
             ) : (
                 <>
                     <p className={styles.info}>
-                        Introduce los resultados de la jornada {matchday}
+                        Jornada {selectedMatchday}
                         {confirmedCount > 0 && confirmedCount < 10 && (
                             <span className={styles.partialInfo}> ({confirmedCount}/10 confirmados)</span>
                         )}

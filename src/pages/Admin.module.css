@@ -1,35 +1,83 @@
 .container {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     text-align: center;
 }
 
-.container h1 {
-    margin-bottom: 2rem;
+.indexBar {
+    display: flex;
+    gap: 0.3rem;
+    overflow-x: auto;
+    padding: 0.4rem 0.5rem;
+    background: var(--surface);
+    border-radius: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+    margin-bottom: 0.4rem;
+}
+
+.indexBar::-webkit-scrollbar {
+    height: 4px;
+}
+
+.indexBar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+.indexBtn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.indexBtn:hover {
+    border-color: var(--primary);
     color: var(--primary);
 }
 
-.matchdaySelector {
-    margin-bottom: 1rem;
+.indexBtnActive {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
 }
 
-.matchdaySelector input {
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-left: 0.5rem;
+.indexBtnActive:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+}
+
+.indexBtnComplete {
+    background: #e5e7eb;
+    color: #9ca3af;
+    border-color: #d1d5db;
+}
+
+.indexBtnComplete.indexBtnActive {
+    background: #9ca3af;
+    color: white;
+    border-color: #9ca3af;
 }
 
 .info {
     color: var(--text-light);
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
 }
 
 .matches {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: left;
 }
 
@@ -38,6 +86,10 @@
     border-radius: 12px;
     padding: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.matchLocked {
+    opacity: 0.7;
 }
 
 .matchDate {
@@ -97,6 +149,11 @@
     outline: none;
     border-color: var(--primary);
     background: white;
+}
+
+.scoreInput:read-only {
+    background: #f3f4f6;
+    color: var(--text-light);
 }
 
 .scoreInput::-webkit-inner-spin-button,
