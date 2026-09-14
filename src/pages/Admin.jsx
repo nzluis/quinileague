@@ -48,7 +48,7 @@ export default function Admin() {
                     const [home, away] = resultsRes.games[match.matchId].score.split('-');
                     existingResults[match.matchId] = { home: parseInt(home), away: parseInt(away) };
                 } else {
-                    existingResults[match.matchId] = { home: 0, away: 0 };
+                    existingResults[match.matchId] = { home: null, away: null };
                 }
             }
             setResults(existingResults);
@@ -61,7 +61,7 @@ export default function Admin() {
     };
 
     const handleScoreChange = (matchId, field, value) => {
-        const num = parseInt(value) || 0;
+        const num = value === '' ? null : parseInt(value);
         setResults((prev) => ({
             ...prev,
             [matchId]: { ...prev[matchId], [field]: num },
@@ -71,17 +71,17 @@ export default function Admin() {
     const handleSubmit = async () => {
         const matchesWithResults = matches.filter((m) => {
             const r = results[m.matchId];
-            return r && (r.home >= 0 || r.away >= 0);
+            return r && r.home !== null && r.away !== null;
         });
 
-        if (matchesWithResults.length !== matches.length) {
-            showError('Introduce el resultado de todos los partidos');
+        if (matchesWithResults.length === 0) {
+            showError('Introduce al menos un resultado');
             return;
         }
 
         setSubmitting(true);
         try {
-            const formattedResults = matches.map((m) => {
+            const formattedResults = matchesWithResults.map((m) => {
                 const r = results[m.matchId];
                 return {
                     matchId: m.matchId,
@@ -90,7 +90,7 @@ export default function Admin() {
                 };
             });
             await api.submitResults(matchday, formattedResults);
-            showSuccess('Resultados guardados');
+            showSuccess(`${formattedResults.length} resultado(s) guardado(s)`);
         } catch (error) {
             showError(error.message || 'Error guardando resultados');
         } finally {
@@ -98,10 +98,12 @@ export default function Admin() {
         }
     };
 
-    const allScoresEntered = matches.length > 0 && matches.every((m) => {
+    const confirmedCount = matches.filter((m) => {
         const r = results[m.matchId];
-        return r && (r.home >= 0 || r.away >= 0);
-    });
+        return r && r.home !== null && r.away !== null;
+    }).length;
+
+    const hasAnyScore = confirmedCount > 0;
 
     return (
         <div className={styles.container}>
@@ -123,53 +125,67 @@ export default function Admin() {
             ) : (
                 <>
                     <p className={styles.info}>
-                        Introduce los resultados de cada partido de la jornada {matchday}
+                        Introduce los resultados de la jornada {matchday}
+                        {confirmedCount > 0 && confirmedCount < 10 && (
+                            <span className={styles.partialInfo}> ({confirmedCount}/10 confirmados)</span>
+                        )}
                     </p>
 
                     <div className={styles.matches}>
-                        {matches.map((match) => (
-                            <div key={match.matchId} className={styles.matchCard}>
-                                <div className={styles.matchDate}>
-                                    {new Date(match.date).toLocaleDateString('es-ES', {
-                                        weekday: 'short',
-                                        day: 'numeric',
-                                        month: 'short',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                    })}
+                        {matches.map((match) => {
+                            const r = results[match.matchId];
+                            const isConfirmed = r && r.home !== null && r.away !== null;
+                            return (
+                                <div
+                                    key={match.matchId}
+                                    className={`${styles.matchCard} ${isConfirmed ? styles.matchConfirmed : ''}`}
+                                >
+                                    <div className={styles.matchDate}>
+                                        {new Date(match.date).toLocaleDateString('es-ES', {
+                                            weekday: 'short',
+                                            day: 'numeric',
+                                            month: 'short',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </div>
+                                    <div className={styles.matchTeams}>
+                                        <span className={styles.team}>{match.homeTeam}</span>
+                                        <span className={styles.versus}>vs</span>
+                                        <span className={styles.team}>{match.awayTeam}</span>
+                                    </div>
+                                    <div className={styles.scoreInputs}>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className={styles.scoreInput}
+                                            value={r?.home ?? ''}
+                                            onChange={(e) => handleScoreChange(match.matchId, 'home', e.target.value)}
+                                        />
+                                        <span className={styles.scoreSeparator}>-</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            className={styles.scoreInput}
+                                            value={r?.away ?? ''}
+                                            onChange={(e) => handleScoreChange(match.matchId, 'away', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
-                                <div className={styles.matchTeams}>
-                                    <span className={styles.team}>{match.homeTeam}</span>
-                                    <span className={styles.versus}>vs</span>
-                                    <span className={styles.team}>{match.awayTeam}</span>
-                                </div>
-                                <div className={styles.scoreInputs}>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        className={styles.scoreInput}
-                                        value={results[match.matchId]?.home ?? 0}
-                                        onChange={(e) => handleScoreChange(match.matchId, 'home', e.target.value)}
-                                    />
-                                    <span className={styles.scoreSeparator}>-</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        className={styles.scoreInput}
-                                        value={results[match.matchId]?.away ?? 0}
-                                        onChange={(e) => handleScoreChange(match.matchId, 'away', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     <button
                         onClick={handleSubmit}
-                        disabled={submitting || !allScoresEntered}
+                        disabled={submitting || !hasAnyScore}
                         className={styles.submitBtn}
                     >
-                        {submitting ? 'Guardando...' : 'Guardar Resultados'}
+                        {submitting
+                            ? 'Guardando...'
+                            : confirmedCount < 10
+                                ? `Guardar parcial (${confirmedCount}/10)`
+                                : 'Guardar todos los resultados'}
                     </button>
                 </>
             )}

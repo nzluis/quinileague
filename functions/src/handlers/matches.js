@@ -1,6 +1,7 @@
 const dbConnect = require('../services/db');
 const Match = require('../services/matchModel');
 const Result = require('../services/resultModel');
+const { getMatchdayStatus } = require('../services/matchdayStatus');
 
 const HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -79,7 +80,14 @@ exports.getNextMatchday = async (event) => {
         }
 
         const resultDocs = await Result.find().lean();
-        const finishedMatchdays = new Set(resultDocs.map((r) => r.matchday));
+        const finishedMatchdays = new Set();
+        for (const doc of resultDocs) {
+            const games = doc.games instanceof Map ? Object.fromEntries(doc.games) : doc.games;
+            const status = getMatchdayStatus(games);
+            if (status.complete) {
+                finishedMatchdays.add(doc.matchday);
+            }
+        }
 
         const nextMatch = await Match.findOne({
             date: { $gt: now },

@@ -1,6 +1,7 @@
 const dbConnect = require('../services/db');
 const Bet = require('../services/betModel');
 const Result = require('../services/resultModel');
+const { getMatchdayStatus } = require('../services/matchdayStatus');
 
 const HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -18,6 +19,8 @@ exports.getStandings = async (event) => {
         const gamesCountByMatchday = {};
         const matchdays = [];
 
+        const provisionalMatchdays = [];
+
         for (const doc of resultDocs) {
             if (doc.games) {
                 const entries = doc.games instanceof Map
@@ -26,6 +29,9 @@ exports.getStandings = async (event) => {
                 if (entries.length === 0) continue;
                 matchdays.push(doc.matchday);
                 gamesCountByMatchday[doc.matchday] = entries.length;
+                if (entries.length < 10) {
+                    provisionalMatchdays.push(doc.matchday);
+                }
                 for (const [matchId, game] of entries) {
                     resultGames[matchId] = game;
                 }
@@ -53,8 +59,9 @@ exports.getStandings = async (event) => {
             }
 
             const totalGames = gamesCountByMatchday[matchday];
+            const isComplete = totalGames >= 10;
             for (const user of Object.values(userPoints)) {
-                if (totalGames > 0 && user.correct === totalGames) {
+                if (isComplete && user.correct === 10) {
                     user.points = 40;
                 }
             }
@@ -79,7 +86,7 @@ exports.getStandings = async (event) => {
         return {
             statusCode: 200,
             headers: HEADERS,
-            body: JSON.stringify({ standings }),
+            body: JSON.stringify({ standings, provisionalMatchdays }),
         };
     } catch (error) {
         console.error(error);
