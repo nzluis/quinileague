@@ -12,6 +12,7 @@ export default function Clasificacion() {
     const [standings, setStandings] = useState([]);
     const [standingsComplete, setStandingsComplete] = useState([]);
     const [provisionalMatchdays, setProvisionalMatchdays] = useState([]);
+    const [allResults, setAllResults] = useState([]);
     const [viewMode, setViewMode] = useState('complete');
     const [loading, setLoading] = useState(true);
 
@@ -21,10 +22,14 @@ export default function Clasificacion() {
 
     const fetchStandings = async () => {
         try {
-            const data = await api.getStandings();
-            setStandings(data.standings || []);
-            setStandingsComplete(data.standingsComplete || []);
-            setProvisionalMatchdays(data.provisionalMatchdays || []);
+            const [standingsData, resultsData] = await Promise.all([
+                api.getStandings(),
+                api.getResults(),
+            ]);
+            setStandings(standingsData.standings || []);
+            setStandingsComplete(standingsData.standingsComplete || []);
+            setProvisionalMatchdays(standingsData.provisionalMatchdays || []);
+            setAllResults(resultsData.results || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -36,6 +41,11 @@ export default function Clasificacion() {
 
     const hasProvisional = provisionalMatchdays.length > 0;
     const currentStandings = viewMode === 'provisional' ? standings : standingsComplete;
+
+    const sortedProvisional = [...provisionalMatchdays].sort((a, b) => a - b);
+    const lastCompleteMatchday = allResults
+        .filter((r) => r.complete)
+        .sort((a, b) => b.matchday - a.matchday)[0]?.matchday;
 
     return (
         <div className={styles.container}>
@@ -55,6 +65,21 @@ export default function Clasificacion() {
                     </button>
                 )}
             </div>
+
+            {viewMode === 'provisional' && hasProvisional && (
+                <div className={styles.warningBanner}>
+                    {sortedProvisional.length === 1
+                        ? `Provisional - Jornada ${sortedProvisional[0]}`
+                        : `Provisional - ${sortedProvisional.length} jornadas en marcha`}
+                </div>
+            )}
+
+            {viewMode === 'complete' && lastCompleteMatchday && (
+                <div className={styles.infoBanner}>
+                    Después de Jornada {lastCompleteMatchday}
+                </div>
+            )}
+
             <table className={styles.table}>
                 <thead>
                     <tr>

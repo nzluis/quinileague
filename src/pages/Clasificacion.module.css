@@ -44,6 +44,30 @@
     color: #6b4400;
 }
 
+.warningBanner {
+    background: rgba(244, 160, 36, 0.15);
+    border: 1px solid var(--secondary);
+    color: #8a5a00;
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.infoBanner {
+    background: rgba(26, 95, 42, 0.08);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 .table {
     width: 100%;
     min-width: 320px;
