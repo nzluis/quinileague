@@ -20,7 +20,7 @@ export default function Resultados() {
         api.getResults().then((data) => {
             const days = (data.results || []).map((r) => r.matchday).sort((a, b) => a - b);
             setAvailableMatchdays(days);
-            setSelectedMatchday(days[days.length - 1] ?? null);
+            setSelectedMatchday(days[0] ?? null);
         }).catch(() => {}).finally(() => setLoading(false));
     }, []);
 
