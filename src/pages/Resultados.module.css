@@ -114,6 +114,23 @@
     color: var(--text-light);
 }
 
+.noBetRow {
+    background: rgba(229, 57, 53, 0.15);
+}
+
+.noBetRow td {
+    color: #8b0000;
+}
+
+.noBetRow .userName {
+    color: #8b0000;
+}
+
+.noBetRow .points,
+.noBetRow .correct {
+    color: #8b0000;
+}
+
 .matches {
     display: grid;
     grid-template-columns: 1fr;
