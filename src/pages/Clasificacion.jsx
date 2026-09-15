@@ -8,6 +8,16 @@ function getDisplayName(userId) {
     return USER_NAMES[userId] || userId;
 }
 
+function getRank(index, standings) {
+    if (index === 0) return 1;
+    const current = standings[index];
+    const previous = standings[index - 1];
+    if (current.points === previous.points) {
+        return getRank(index - 1, standings);
+    }
+    return index + 1;
+}
+
 export default function Clasificacion() {
     const [standings, setStandings] = useState([]);
     const [standingsComplete, setStandingsComplete] = useState([]);
@@ -93,7 +103,7 @@ export default function Clasificacion() {
                 <tbody>
                     {currentStandings.map((entry, index) => (
                         <tr key={entry.userId}>
-                            <td>{index + 1}</td>
+                            <td>{getRank(index, currentStandings)}</td>
                             <td>{getDisplayName(entry.userId)}</td>
                             <td>{entry.points}</td>
                             <td>{entry.correct}</td>
