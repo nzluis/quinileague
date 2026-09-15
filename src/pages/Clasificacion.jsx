@@ -85,8 +85,9 @@ export default function Clasificacion() {
                     <tr>
                         <th>#</th>
                         <th>Usuario</th>
-                        <th>Puntos</th>
-                        <th>Aciertos</th>
+                        <th>🏆</th>
+                        <th>🎯</th>
+                        <th>💀</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,6 +97,7 @@ export default function Clasificacion() {
                             <td>{getDisplayName(entry.userId)}</td>
                             <td>{entry.points}</td>
                             <td>{entry.correct}</td>
+                            <td>{entry.zeros}</td>
                         </tr>
                     ))}
                 </tbody>
