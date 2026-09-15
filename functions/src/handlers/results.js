@@ -10,7 +10,7 @@ const HEADERS = {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 };
 
-function calculateMatchdayPoints(bets, games) {
+function calculateMatchdayPoints(bets, games, allUserIds) {
     const usersMap = {};
     for (const bet of bets) {
         if (!usersMap[bet.userId]) {
@@ -32,10 +32,16 @@ function calculateMatchdayPoints(bets, games) {
         }
     }
 
+    for (const userId of allUserIds) {
+        if (!usersMap[userId]) {
+            usersMap[userId] = { userId, bets: {}, points: '-', correct: '-', noBet: true };
+        }
+    }
+
     return {
         users: Object.values(usersMap),
         summary: Object.fromEntries(
-            Object.values(usersMap).map((u) => [u.userId, { points: u.points, correct: u.correct }])
+            Object.values(usersMap).map((u) => [u.userId, { points: u.points, correct: u.correct, noBet: u.noBet }])
         ),
     };
 }
@@ -80,7 +86,9 @@ exports.getResults = async (event) => {
             }
 
             const bets = await Bet.find({ matchday }).lean();
-            const { users, summary } = calculateMatchdayPoints(bets, dayData.games);
+            const allBets = await Bet.find({}).lean();
+            const allUserIds = [...new Set(allBets.map((b) => b.userId))];
+            const { users, summary } = calculateMatchdayPoints(bets, dayData.games, allUserIds);
 
             const matchesWithResult = dayData.matches.map((m) => {
                 const game = dayData.games[m.matchId];
