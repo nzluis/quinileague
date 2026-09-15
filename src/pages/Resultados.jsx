@@ -68,6 +68,7 @@ export default function Resultados() {
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Usuario</th>
                                         <th>Puntos</th>
                                         <th>Aciertos</th>
@@ -80,8 +81,9 @@ export default function Resultados() {
                                             if (!a.noBet && b.noBet) return -1;
                                             return b.points - a.points;
                                         })
-                                        .map(([userId, data]) => (
+                                        .map(([userId, data], index) => (
                                             <tr key={userId} className={data.noBet ? styles.noBetRow : ''}>
+                                                <td>{index + 1}</td>
                                                 <td className={styles.userName}>{getDisplayName(userId)}</td>
                                                 <td className={styles.points}>{data.noBet ? '-' : data.points}</td>
                                                 <td className={styles.correct}>{data.noBet ? '-' : data.correct}</td>
