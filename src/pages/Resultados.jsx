@@ -75,12 +75,16 @@ export default function Resultados() {
                                 </thead>
                                 <tbody>
                                     {Object.entries(matchdayData.summary || {})
-                                        .sort(([, a], [, b]) => b.points - a.points)
+                                        .sort(([, a], [, b]) => {
+                                            if (a.noBet && !b.noBet) return 1;
+                                            if (!a.noBet && b.noBet) return -1;
+                                            return b.points - a.points;
+                                        })
                                         .map(([userId, data]) => (
-                                            <tr key={userId}>
+                                            <tr key={userId} className={data.noBet ? styles.noBetRow : ''}>
                                                 <td className={styles.userName}>{getDisplayName(userId)}</td>
-                                                <td className={styles.points}>{data.points}</td>
-                                                <td className={styles.correct}>{data.correct}</td>
+                                                <td className={styles.points}>{data.noBet ? '-' : data.points}</td>
+                                                <td className={styles.correct}>{data.noBet ? '-' : data.correct}</td>
                                             </tr>
                                         ))}
                                 </tbody>
