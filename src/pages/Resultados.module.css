@@ -97,6 +97,16 @@
     font-size: 0.85rem;
 }
 
+.summaryTable td:first-child {
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+}
+
+.summaryTable th:first-child {
+    text-align: center;
+}
+
 .summaryTable tr:not(:last-child) td {
     border-bottom: 1px solid #eee;
 }
