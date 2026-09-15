@@ -43,6 +43,8 @@ exports.getStandings = async (event) => {
         const pointsByUser = {};
         const pointsByUserComplete = {};
 
+        const allUserIds = [...new Set(allBets.map((b) => b.userId))];
+
         for (const matchday of matchdays) {
             const dayBets = allBets.filter((b) => b.matchday === matchday);
             const totalGames = gamesCountByMatchday[matchday];
@@ -67,25 +69,35 @@ exports.getStandings = async (event) => {
                 }
             }
 
-            for (const [userId, data] of Object.entries(userPoints)) {
+            for (const userId of allUserIds) {
                 if (!pointsByUser[userId]) {
-                    pointsByUser[userId] = { points: 0, correct: 0 };
+                    pointsByUser[userId] = { points: 0, correct: 0, zeros: 0 };
                 }
-                pointsByUser[userId].points += data.points;
-                pointsByUser[userId].correct += data.correct;
+
+                const hasBet = userPoints[userId] !== undefined;
+                if (!hasBet) {
+                    pointsByUser[userId].zeros += 1;
+                } else {
+                    pointsByUser[userId].points += userPoints[userId].points;
+                    pointsByUser[userId].correct += userPoints[userId].correct;
+                }
 
                 if (isComplete) {
                     if (!pointsByUserComplete[userId]) {
-                        pointsByUserComplete[userId] = { points: 0, correct: 0 };
+                        pointsByUserComplete[userId] = { points: 0, correct: 0, zeros: 0 };
                     }
-                    pointsByUserComplete[userId].points += data.points;
-                    pointsByUserComplete[userId].correct += data.correct;
+                    if (!hasBet) {
+                        pointsByUserComplete[userId].zeros += 1;
+                    } else {
+                        pointsByUserComplete[userId].points += userPoints[userId].points;
+                        pointsByUserComplete[userId].correct += userPoints[userId].correct;
+                    }
                 }
             }
         }
 
         const sortStandings = (map) => Object.entries(map)
-            .map(([userId, data]) => ({ userId, points: data.points, correct: data.correct }))
+            .map(([userId, data]) => ({ userId, points: data.points, correct: data.correct, zeros: data.zeros }))
             .sort((a, b) => b.points - a.points);
 
         const standings = sortStandings(pointsByUser);
