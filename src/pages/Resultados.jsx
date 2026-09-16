@@ -10,6 +10,24 @@ function getDisplayName(userId) {
     return USER_NAMES[userId] || userId;
 }
 
+function getRank(index, entries) {
+    if (index === 0) return 1;
+    const current = entries[index][1];
+    const previous = entries[index - 1][1];
+    if (current.points === previous.points) {
+        return getRank(index - 1, entries);
+    }
+    return index + 1;
+}
+
+function getRankDisplay(index, entries) {
+    if (index === 0) return getRank(0, entries);
+    const current = entries[index][1];
+    const previous = entries[index - 1][1];
+    if (current.points === previous.points) return '-';
+    return getRank(index, entries);
+}
+
 export default function Resultados() {
     const [availableMatchdays, setAvailableMatchdays] = useState([]);
     const [selectedMatchday, setSelectedMatchday] = useState(undefined);
@@ -81,9 +99,9 @@ export default function Resultados() {
                                             if (!a.noBet && b.noBet) return -1;
                                             return b.points - a.points;
                                         })
-                                        .map(([userId, data], index) => (
+                                        .map(([userId, data], index, entries) => (
                                             <tr key={userId} className={data.noBet ? styles.noBetRow : ''}>
-                                                <td>{index + 1}</td>
+                                                <td>{getRankDisplay(index, entries)}</td>
                                                 <td className={styles.userName}>{getDisplayName(userId)}</td>
                                                 <td className={styles.points}>{data.noBet ? '-' : data.points}</td>
                                                 <td className={styles.correct}>{data.noBet ? '-' : data.correct}</td>
