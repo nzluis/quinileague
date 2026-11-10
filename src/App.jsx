@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar/Navbar';
@@ -11,6 +12,8 @@ import Admin from './pages/Admin';
 import Check from './pages/Check';
 import Spinner from './components/Spinner/Spinner';
 import layoutStyles from './Layout.module.css';
+
+const Evolucion = lazy(() => import('./pages/Evolucion'));
 
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
@@ -68,6 +71,16 @@ function Shell() {
                         element={
                             <ProtectedRoute>
                                 <Check />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/evolution"
+                        element={
+                            <ProtectedRoute>
+                                <Suspense fallback={<Spinner />}>
+                                    <Evolucion />
+                                </Suspense>
                             </ProtectedRoute>
                         }
                     />

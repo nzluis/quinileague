@@ -64,6 +64,13 @@ functions:
                   path: /standings
                   method: get
 
+    getStandingsHistory:
+        handler: src/handlers/standings.getStandingsHistory
+        events:
+            - httpApi:
+                  path: /standings/history
+                  method: get
+
     getMissingBets:
         handler: src/handlers/admin.getMissingBets
         events:

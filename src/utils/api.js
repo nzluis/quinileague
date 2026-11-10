@@ -58,6 +58,10 @@ export default {
         return request(`/standings`);
     },
 
+    async getStandingsHistory() {
+        return request(`/standings/history`);
+    },
+
     async getMissingBets() {
         return request(`/admin/missing-bets`);
     },
