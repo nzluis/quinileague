@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styles from './Navbar.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ADMIN_USERS, FULL_ADMIN_USERS } from '../../utils/constants';
+import { ADMIN_USERS, FULL_ADMIN_USERS, EVOLUTION_ADMIN_USERS } from '../../utils/constants';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -13,6 +13,7 @@ export default function Navbar() {
     const isActive = (path) => location.pathname === path;
     const isAdmin = ADMIN_USERS.includes(user?.username);
     const isFullAdmin = FULL_ADMIN_USERS.includes(user?.username);
+    const isEvolutionAdmin = EVOLUTION_ADMIN_USERS.includes(user?.username);
 
     if (!user) return null;
 
@@ -70,7 +71,7 @@ export default function Navbar() {
                     {isAdmin && (
                         <li className={styles.adminItem}>
                             <button
-                                className={`${styles.adminBtn} ${isActive('/admin') || isActive('/admin/check') ? styles.active : ''}`}
+                                className={`${styles.adminBtn} ${isActive('/admin') || isActive('/admin/check') || isActive('/admin/evolution') ? styles.active : ''}`}
                                 onClick={() => setAdminOpen((o) => !o)}
                             >
                                 Admin
@@ -80,7 +81,7 @@ export default function Navbar() {
                                 <li>
                                     <Link
                                         to="/admin"
-                                        className={isActive('/admin') && !isActive('/admin/check') ? styles.active : ''}
+                                        className={isActive('/admin') && !isActive('/admin/check') && !isActive('/admin/evolution') ? styles.active : ''}
                                         onClick={closeAll}
                                     >
                                         Subir Resultados
@@ -94,6 +95,17 @@ export default function Navbar() {
                                             onClick={closeAll}
                                         >
                                             Check
+                                        </Link>
+                                    </li>
+                                )}
+                                {isEvolutionAdmin && (
+                                    <li>
+                                        <Link
+                                            to="/admin/evolution"
+                                            className={isActive('/admin/evolution') ? styles.active : ''}
+                                            onClick={closeAll}
+                                        >
+                                            Evolución
                                         </Link>
                                     </li>
                                 )}

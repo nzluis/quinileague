@@ -117,3 +117,106 @@ exports.getStandings = async (event) => {
         };
     }
 };
+
+exports.getStandingsHistory = async (event) => {
+    try {
+        await dbConnect();
+
+        const resultDocs = await Result.find().lean();
+
+        const resultGames = {};
+        const gamesCountByMatchday = {};
+
+        for (const doc of resultDocs) {
+            if (doc.games) {
+                const entries = doc.games instanceof Map
+                    ? Array.from(doc.games.entries())
+                    : Object.entries(doc.games);
+                if (entries.length === 0) continue;
+                gamesCountByMatchday[doc.matchday] = entries.length;
+                for (const [matchId, game] of entries) {
+                    resultGames[matchId] = game;
+                }
+            }
+        }
+
+        const allBets = await Bet.find({}).lean();
+
+        const allUserIds = [...new Set(allBets.map((b) => b.userId))];
+
+        const finishedMatchdays = Object.keys(gamesCountByMatchday)
+            .map(Number)
+            .filter((md) => gamesCountByMatchday[md] >= 10)
+            .sort((a, b) => a - b);
+
+        const totals = {};
+        for (const userId of allUserIds) {
+            totals[userId] = { points: 0, correct: 0 };
+        }
+
+        const evolution = [];
+
+        for (const matchday of finishedMatchdays) {
+            const dayBets = allBets.filter((b) => b.matchday === matchday);
+
+            const userPoints = {};
+            for (const bet of dayBets) {
+                if (!userPoints[bet.userId]) {
+                    userPoints[bet.userId] = { points: 0, correct: 0 };
+                }
+                const game = resultGames[bet.matchId];
+                if (!game) continue;
+                if (bet.prediction === game.result) {
+                    userPoints[bet.userId].points += 3;
+                    userPoints[bet.userId].correct += 1;
+                }
+            }
+
+            for (const user of Object.values(userPoints)) {
+                if (user.correct === 10) {
+                    user.points = 40;
+                }
+            }
+
+            for (const userId of allUserIds) {
+                const day = userPoints[userId];
+                if (day) {
+                    totals[userId].points += day.points;
+                    totals[userId].correct += day.correct;
+                }
+            }
+
+            const sorted = allUserIds
+                .map((userId) => ({ userId, points: totals[userId].points }))
+                .sort((a, b) => b.points - a.points);
+
+            const positions = {};
+            for (let i = 0; i < sorted.length; i++) {
+                if (i > 0 && sorted[i].points === sorted[i - 1].points) {
+                    positions[sorted[i].userId] = positions[sorted[i - 1].userId];
+                } else {
+                    positions[sorted[i].userId] = i + 1;
+                }
+            }
+            evolution.push(positions);
+        }
+
+        const history = allUserIds.map((userId) => ({
+            userId,
+            positions: evolution.map((entry) => entry[userId]),
+        }));
+
+        return {
+            statusCode: 200,
+            headers: HEADERS,
+            body: JSON.stringify({ matchdays: finishedMatchdays, evolution: history }),
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            statusCode: 500,
+            headers: HEADERS,
+            body: JSON.stringify({ error: 'Error fetching standings history' }),
+        };
+    }
+};
